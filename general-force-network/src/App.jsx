@@ -1,14 +1,14 @@
 // App.jsx
 
-import React from 'react';
-import ForceDirectedGraph from './components/forcenetworkgrapgh.jsx';
+import React from "react";
+import SelectType from "./components/selecttype.jsx";
+import {  Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div>
-      <h1>Force-directed Graph</h1>
-      <ForceDirectedGraph />
-    </div>
+    <Routes>
+          <Route  path="/" element={ <SelectType/>} />
+    </Routes>
   );
 }
 
