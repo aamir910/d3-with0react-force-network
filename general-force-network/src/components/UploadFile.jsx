@@ -1,36 +1,42 @@
+import React, { useState } from "react";
 
-import React, { useState } from 'react';
-// import XLSX from 'xlsx';
+import * as xlsx from "xlsx"; // Import xlsx library
+
 function UploadFile() {
-
-  const [jsonData, setJsonData] = useState(null);
-
+  const readUploadFile = (e) => {
+    e.preventDefault();
+    if (e.target.files) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = xlsx.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = xlsx.utils.sheet_to_json(worksheet);
+        console.log(json);
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+  };
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
 
-    reader.onload = (evt) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws);
-      setJsonData(data);
-    };
-
-    reader.readAsBinaryString(file);
+    console.log(file, "file");
   };
 
   return (
-    <div>
-      <h1>Kindly upload the csv file there</h1>
-      <input type="file" accept=".xlsx" onChange={handleFileUpload} />
-      <div>
-          <h3>JSON Data:</h3>
-          <pre>{JSON.stringify(jsonData, null, 2)}</pre>
-        </div>
-    </div>
-  )
+    <>
+      <form>
+        <label htmlFor="upload">Upload File</label>
+        <input
+          type="file"
+          name="upload"
+          id="upload"
+          onChange={readUploadFile}
+        />
+      </form>
+    </>
+  );
 }
 
-export default UploadFile
+export default UploadFile;
