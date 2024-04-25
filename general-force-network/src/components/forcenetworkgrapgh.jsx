@@ -1,27 +1,50 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const ForceDirectedGraph = () => {
+const ForceDirectedGraph = ({jsondata}) => {
   const svgRef = useRef();
-
+console.log("here is the jsondata " , jsondata) ; 
   useEffect(() => {
     const width = 600;
     const height = 400;
 
-    const nodes = [
-      { id: 0, name: 'Node 1' },
-      { id: 1, name: 'Node 2' },
-      { id: 2, name: 'Node 3' },
-      { id: 3, name: 'Node 4' },
-    ];
+    // const nodes = [
+    //   { id: 0, name: 'Node 1' },
+    //   { id: 1, name: 'Node 2' },
+    //   { id: 2, name: 'Node 3' },
+    //   { id: 3, name: 'Node 4' },
+    // ];
+  let nodes = [] ;
+let uniqueNodes = new Set(); 
+  jsondata.forEach(item => {
+    console.log(item ,"here is the item")
+if(!uniqueNodes.has(item.entity_1)){
+  uniqueNodes.add(item.entity_1) ; 
+  nodes.push({ name: item.entity_1, class: item.entity_1_class });
+}
+if(!uniqueNodes.has(item.entity_2)){
+  uniqueNodes.add(item.entity_2) ; 
+  nodes.push({ name: item.entity_2, class: item.entity_2_class });
+}
+  });
 
-    const links = [
-      { source: 0, target: 1 },
-      { source: 1, target: 2 },
-      { source: 2, target: 3 },
-      { source: 3, target: 0 },
-    ];
 
+    console.log(nodes ,"here are the nodes")
+    // const links = [
+    //   { source: 0, target: 1 },
+    //   { source: 1, target: 2 },
+    //   { source: 2, target: 3 },
+    //   { source: 3, target: 0 },
+    // ];
+
+    const links = jsondata.map(item => ({
+      source: item.entity_1,
+      target: item.entity_2,
+      value: item.link_strength
+    }));
+
+
+    console.log(links ,"here are the links")
     const svg = d3.select(svgRef.current)
       .attr('width', width)
       .attr('height', height)
@@ -29,8 +52,8 @@ const ForceDirectedGraph = () => {
       .style('margin', 'auto');
 
     const simulation = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(d => d.id).distance(100))
-      .force('charge', d3.forceManyBody().strength(-100))
+      .force('link', d3.forceLink(links).id(d => d.name).distance(100))
+      .force('charge', d3.forceManyBody().strength(-50))
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     const link = svg.selectAll('line')
