@@ -68,7 +68,9 @@ if(!uniqueNodes.has(item.entity_2)){
       .enter()
       .append('circle')
       .attr('r', 20)
-      .attr('fill', 'blue')
+      .attr('fill', function(d){
+        return d.class === "entity_1_class" ? 'red' : 'green';
+      })
       .call(d3.drag()
         .on('start', dragstarted)
         .on('drag', dragged)
