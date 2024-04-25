@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 
 import * as xlsx from "xlsx"; // Import xlsx library
-import ForceDirectedGraph from "./forcenetworkgrapgh";
 import { Link, useNavigate } from "react-router-dom";
-
 function UploadFile() {
-
   const navigate = useNavigate();
-  const [jsondata , setjsondata] = useState(null) ; 
+  const [jsondata, setjsondata] = useState(null);
   const readUploadFile = (e) => {
     e.preventDefault();
     if (e.target.files) {
@@ -19,13 +16,13 @@ function UploadFile() {
         const worksheet = workbook.Sheets[sheetName];
         const json = xlsx.utils.sheet_to_json(worksheet);
         console.log(json);
-   setjsondata(json)
-   navigate(`/force-directed-graph`, { state: { jsondata: json } });
+        setjsondata(json);
+        navigate(`/force-directed-graph`, { state: { jsondata: json } });
       };
       reader.readAsArrayBuffer(e.target.files[0]);
     }
   };
- 
+
   return (
     <>
       <h1>Kindly upload the csv file there</h1>
@@ -35,20 +32,10 @@ function UploadFile() {
           type="file"
           name="upload"
           id="upload"
-          accept=".xlsx"  
+          accept=".xlsx"
           onChange={readUploadFile}
         />
       </form>
-     {/* {jsondata && (
-      <>
-      <Link to = '/force-directed-graph'>
-
-      </Link>
-
-      </>
-     )
-     } */}
-{/* {jsondata && <ForceDirectedGraph  jsondata={jsondata}/>} */}
     </>
   );
 }
