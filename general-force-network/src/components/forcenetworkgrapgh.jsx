@@ -1,8 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const ForceDirectedGraph = ({jsondata}) => {
+import { useLocation } from "react-router-dom";
+
+const ForceDirectedGraph = () => {
+  const location = useLocation();
+  const { jsondata } = location.state;
   const svgRef = useRef();
+
 console.log("here is the jsondata " , jsondata) ; 
   useEffect(() => {
     const width = 600;
@@ -111,7 +116,13 @@ if(!uniqueNodes.has(item.entity_2)){
     return () => simulation.stop();
   }, []);
 
-  return <svg ref={svgRef}></svg>;
+  return(
+
+    <>
+  <h1>force network graph</h1>
+  <svg ref={svgRef}></svg>;
+  </>
+) 
 };
 
 export default ForceDirectedGraph;

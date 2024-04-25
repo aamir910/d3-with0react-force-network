@@ -23,7 +23,7 @@ function SelectType() {
       <h1>select the type</h1>
       {showButton ? (
         <>
-          <Link to='/force-directed-graph'>
+          <Link to='/upload-file'>
             <img src={forceimage} alt="" />
             <p>force network diagram</p>
           </Link>

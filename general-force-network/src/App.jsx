@@ -9,10 +9,8 @@ function App() {
   return (
     <Routes>
           <Route  path="/" element={ <SelectType/>} />
-          {/* <Route path="force-directed-graph" element={<ForceDirectedGraph/>} /> */}
-          {/* <Route path="download-xlxs" element={<ForceDirectedGraph/>} /> */}
-
-          <Route path="force-directed-graph" element={<UploadFile/>} />
+          <Route path="upload-file" element={<UploadFile/>} />
+          <Route path="force-directed-graph" element={<ForceDirectedGraph />} />
     </Routes>
   );
 }
