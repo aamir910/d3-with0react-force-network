@@ -136,14 +136,14 @@ const ForceDirectedGraph = () => {
 
  
     return (
-      <div className="  flex flex-col md:flex-row">
+      <div className=" container mt-3  flex flex-col md:flex-row">
         {/* First column takes up 8/12 width on medium and larger screens */}
         <div className="w-full md:w-10/12">
           <h1 className=" text-3xl text-center md:text-left">Force Network Graph</h1>
           <svg ref={svgRef} className=" bg-orange-100 w-full h-auto"></svg>
         </div>
         {/* Second column takes up 4/12 width on medium and larger screens */}
-        <div className="w-full md:w-3/12">
+        <div className=" container m-2 w-full md:w-2/12">
           <LegendData />
         </div>
       </div>

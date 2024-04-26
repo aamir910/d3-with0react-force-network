@@ -2,9 +2,13 @@ import React from 'react'
 
 const LegendData = () => {
   return (
-    <div>
+    <>
+    
+    <div className=''>
  <h1>legend data</h1>
+ 
     </div>
+    </>
   )
 }
 
