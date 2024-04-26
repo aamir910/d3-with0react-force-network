@@ -12,21 +12,31 @@ const ForceDirectedGraph = () => {
   useEffect(() => {
     const width = 600;
     const height = 400;
-
+    const uniqueClasses = new Set();
     let nodes = [];
     let uniqueNodes = new Set();
     jsondata.forEach((item) => {
+      if (!uniqueClasses.has(item.entity_1_class)) {
+        uniqueClasses.add(item.entity_1_class);
+      }
       if (!uniqueNodes.has(item.entity_1)) {
         uniqueNodes.add(item.entity_1);
-        nodes.push({ name: item.entity_1, class: item.entity_1_class });
+        nodes.push({ name: item.entity_1,
+           class: item.entity_1_class ,
+           type : "entity_1"});
       }
       if (!uniqueNodes.has(item.entity_2)) {
         uniqueNodes.add(item.entity_2);
-        nodes.push({ name: item.entity_2, class: item.entity_2_class });
+        nodes.push({ name: item.entity_2, 
+          class: item.entity_2_class ,
+           type : "entity_2"
+        });
+
       }
     });
 
     console.log(nodes, "here are the nodes");
+    console.log(uniqueClasses, "here are the unique classes");
 
     const links = jsondata.map((item) => ({
       source: item.entity_1,
@@ -42,6 +52,11 @@ const ForceDirectedGraph = () => {
       .style("display", "block")
       .style("margin", "auto");
 
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain([...uniqueClasses])
+      .range(d3.schemeCategory10);
+
     const simulation = d3
       .forceSimulation(nodes)
       .force(
@@ -52,7 +67,9 @@ const ForceDirectedGraph = () => {
           .distance(100)
       )
       .force("charge", d3.forceManyBody().strength(-50))
-      .force("center", d3.forceCenter(width / 2, height / 2));
+      .force("center", d3.forceCenter(width / 2, height / 2))
+
+      .force("collide", d3.forceCollide().radius(10)); // Add forceCollide;
 
     const link = svg
       .selectAll("line")
@@ -66,11 +83,17 @@ const ForceDirectedGraph = () => {
       .selectAll("circle")
       .data(nodes)
       .enter()
+ 
       .append("circle")
-      .attr("r", 20)
-      .attr("fill", function (d) {
-        return d.class === "entity_1_class" ? "red" : "green";
+      .attr("r", (d) => {
+        if(d.type === "entity_1"){
+          return 15
+        }
+        else{
+          return 10
+        }
       })
+      .attr("fill", (d) => colorScale(d.class))
       .call(
         d3
           .drag()
