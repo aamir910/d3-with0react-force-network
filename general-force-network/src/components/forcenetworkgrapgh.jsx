@@ -7,6 +7,7 @@ const ForceDirectedGraph = () => {
   const location = useLocation();
   const { jsondata } = location.state;
   const svgRef = useRef();
+  
 
   console.log("here is the jsondata ", jsondata);
   useEffect(() => {
@@ -71,6 +72,7 @@ const ForceDirectedGraph = () => {
 
       .force("collide", d3.forceCollide().radius(10)); // Add forceCollide;
 
+
     const link = svg
       .selectAll("line")
       .data(links)
@@ -79,30 +81,36 @@ const ForceDirectedGraph = () => {
       .attr("stroke", "#ccc")
       .attr("stroke-width", 2);
 
-    const node = svg
-      .selectAll("circle")
-      .data(nodes)
-      .enter()
- 
-      .append("circle")
-      .attr("r", (d) => {
-        if(d.type === "entity_1"){
-          return 15
-        }
-        else{
-          return 10
-        }
-      })
-      .attr("fill", (d) => colorScale(d.class))
-      .call(
-        d3
-          .drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended)
-      );
+    let node;
+    
+    node = svg
+    .selectAll(".node")
+    .data(nodes)
+    .enter()
+    .append("g")
+    .attr("class", "node")  
+       .call(
+          d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        );
 
-    node.append("title").text((d) => d.name);
+        node.filter((d) => d.type === "entity_1")
+        .append("circle")
+        .attr("r" , 20 )
+          .attr("fill", (d) => colorScale(d.class))
+
+        node.filter((d) => d.type === "entity_2")
+        .append("circle")
+        .attr("r" , 10 )
+          .attr("fill", (d) => colorScale(d.class))
+
+
+          
+    const svgWidth = +svg.node().getBoundingClientRect().width;
+    const svgHeight = +svg.node().getBoundingClientRect().height;
 
     simulation.on("tick", () => {
       link
@@ -110,8 +118,8 @@ const ForceDirectedGraph = () => {
         .attr("y1", (d) => d.source.y)
         .attr("x2", (d) => d.target.x)
         .attr("y2", (d) => d.target.y);
-
-      node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+        node.attr("transform", (d) => `translate(${Math.max(0, Math.min(svgWidth, d.x))}
+        ,${Math.max(0, Math.min(svgHeight, d.y))})`);
     });
 
     function dragstarted(event) {
