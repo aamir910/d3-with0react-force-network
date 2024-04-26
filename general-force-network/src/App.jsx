@@ -3,7 +3,7 @@
 import React from "react";
 import SelectType from "./components/selecttype.jsx";
 import {  Routes, Route } from "react-router-dom";
-import ForceDirectedGraph from "./components/forcenetworkgrapgh.jsx";
+import ForceDirectedGraph from "./components/forcenetworkGraph/forcenetworkgrapgh.jsx";
 import UploadFile from "./components/UploadFile.jsx";
 function App() {
   return (
