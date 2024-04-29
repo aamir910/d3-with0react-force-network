@@ -196,9 +196,9 @@ const ForceDirectedGraph = () => {
           <h1 className=" text-3xl text-center md:text-left">
             Force Network Graph
           </h1>
-          <svg ref={svgRef} className=" bg-orange-100 w-full h-auto"></svg>
+          <svg ref={svgRef} className="  w-full h-auto"></svg>
         </div>
-        {/* Second column takes up 4/12 width on medium and larger screens */}
+        {/* Second column takes up 4/12 width on medium and larger screens bg-orange-100 */}
         <div className=" container m-1 w-full md:w-2/12">
           <LegendData
             uniqueClasses={uniqueClasses}

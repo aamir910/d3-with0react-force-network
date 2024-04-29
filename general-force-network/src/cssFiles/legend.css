@@ -2,7 +2,7 @@
 .legend{
     border: 2px solid black;
     height: auto;
-    background-color: azure;
+    /* background-color: azure; */
     border-radius: 20px;
 }
 .circle {
