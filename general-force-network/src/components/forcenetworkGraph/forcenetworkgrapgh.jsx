@@ -11,16 +11,22 @@ const ForceDirectedGraph = () => {
   const svgRef = useRef();
 
   console.log("here is the jsondata ", jsondata);
+  const uniqueClasses = [];
+  const uniqueClasses2 = [];
+  let uniqueNodes = new Set();
   useEffect(() => {
     const width = 600;
     const height = 400;
-    const uniqueClasses = new Set();
     let nodes = [];
-    let uniqueNodes = new Set();
     jsondata.forEach((item) => {
-      if (!uniqueClasses.has(item.entity_1_class)) {
-        uniqueClasses.add(item.entity_1_class);
+      if (!uniqueClasses.includes(item.entity_1_class)) {
+        uniqueClasses.push(item.entity_1_class);
       }
+      if (!uniqueClasses2.includes(item.entity_2_class)) {
+        uniqueClasses2.push(item.entity_2_class);
+      }
+
+
       if (!uniqueNodes.has(item.entity_1)) {
         uniqueNodes.add(item.entity_1);
         nodes.push({ name: item.entity_1, class: item.entity_1_class, type: "entity_1" });
@@ -147,7 +153,7 @@ const ForceDirectedGraph = () => {
         </div>
         {/* Second column takes up 4/12 width on medium and larger screens */}
         <div className=" container m-1 w-full md:w-2/12">
-          <LegendData />
+          <LegendData  uniqueClasses ={uniqueClasses} uniqueClasses2= {uniqueClasses2}/>
         </div>
       </div>
       </>
