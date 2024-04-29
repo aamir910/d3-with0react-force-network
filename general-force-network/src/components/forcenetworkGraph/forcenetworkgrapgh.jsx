@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { useLocation } from "react-router-dom";
 import LegendData from "./LegendData";
 import { Container, Row, Col } from "react-bootstrap";
+import Example from "./Navbar";
 
 const ForceDirectedGraph = () => {
   const location = useLocation();
@@ -136,6 +137,8 @@ const ForceDirectedGraph = () => {
 
  
     return (
+      <>
+      <Example/>
       <div className=" container mt-3  flex flex-col md:flex-row">
         {/* First column takes up 8/12 width on medium and larger screens */}
         <div className="w-full md:w-10/12">
@@ -143,10 +146,11 @@ const ForceDirectedGraph = () => {
           <svg ref={svgRef} className=" bg-orange-100 w-full h-auto"></svg>
         </div>
         {/* Second column takes up 4/12 width on medium and larger screens */}
-        <div className=" container m-2 w-full md:w-2/12">
+        <div className=" container m-1 w-full md:w-2/12">
           <LegendData />
         </div>
       </div>
+      </>
     );
 };
 
