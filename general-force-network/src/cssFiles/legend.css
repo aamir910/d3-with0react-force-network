@@ -1,6 +1,16 @@
 
 .legend{
     border: 2px solid black;
-    height: 500px;
+    height: auto;
     background-color: azure;
+    border-radius: 20px;
 }
+.circle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: black;
+    margin-right: 5px; /* Adjust this value according to your needs */
+  }
+  
