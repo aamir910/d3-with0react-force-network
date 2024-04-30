@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../cssFiles/legend.css';
 
-const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale }) => {
+const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale , uniqueLinks }) => {
   
   return (
     <>
@@ -24,6 +24,17 @@ const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale }) => {
         <span className="circle"  style={{
                 backgroundColor: colorScale(entity_2_li),
               }}></span> {entity_2_li}
+      </li>
+    ))}
+  </ul>
+  {/* link type  */}
+  <ul className='ml-1'>
+    <li className='entity_1 font-semibold'> Link Type</li>
+    {uniqueLinks.map((link_type, index) => (
+      <li key={index }  className='ml-6'>
+         <span className="line"  style={{
+                backgroundColor: colorScale(link_type),
+              }}></span> {link_type}
       </li>
     ))}
   </ul>

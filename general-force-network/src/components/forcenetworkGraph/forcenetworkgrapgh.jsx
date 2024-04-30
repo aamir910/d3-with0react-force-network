@@ -11,6 +11,8 @@ const ForceDirectedGraph = () => {
   const svgRef = useRef();
   const [uniqueClasses, setUniqueClasses] = useState([]);
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
+  
+  const [uniqueLinks, setUniqueLinks] = useState([]);
   const colors = [
     "red",
     "blue",
@@ -34,6 +36,7 @@ const ForceDirectedGraph = () => {
     let nodes = [];
     let uniqueClassesTemp = [];
     let uniqueClasses2Temp = [];
+    let uniqLinkTemp = []
     let uniqueNodes = new Set();
 
     jsondata.forEach((item) => {
@@ -42,6 +45,9 @@ const ForceDirectedGraph = () => {
       }
       if (!uniqueClasses2Temp.includes(item.entity_2_class)) {
         uniqueClasses2Temp.push(item.entity_2_class);
+      }
+      if (!uniqLinkTemp.includes(item.Link_Type)) {
+        uniqLinkTemp.push(item.Link_Type);
       }
 
       if (!uniqueNodes.has(item.entity_1)) {
@@ -64,11 +70,13 @@ const ForceDirectedGraph = () => {
 
     setUniqueClasses(uniqueClassesTemp);
     setUniqueClasses2(uniqueClasses2Temp);
+    setUniqueLinks(uniqLinkTemp) ; 
 
     const links = jsondata.map((item) => ({
       source: item.entity_1,
       target: item.entity_2,
       value: item.link_strength,
+      
     }));
 
     const svg = d3
@@ -203,6 +211,7 @@ const ForceDirectedGraph = () => {
           <LegendData
             uniqueClasses={uniqueClasses}
             uniqueClasses2={uniqueClasses2}
+            uniqueLinks ={uniqueLinks}
             colorScale ={d3
             .scaleOrdinal()
             .domain([...uniqueClasses])

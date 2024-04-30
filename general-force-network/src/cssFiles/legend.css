@@ -13,4 +13,11 @@
     background-color: black;
     margin-right: 5px; /* Adjust this value according to your needs */
   }
+  .line {
+    display: inline-block;
+    width: 15px;
+    height: 3px;
+    background-color: black;
+    margin-right: 5px; /* Adjust this value according to your needs */
+  }
   
