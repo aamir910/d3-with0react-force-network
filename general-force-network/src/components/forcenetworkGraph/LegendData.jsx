@@ -1,8 +1,8 @@
 import React from 'react';
 import '../../cssFiles/legend.css';
 
-const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale , uniqueLinks }) => {
-  
+const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale_entity_1 ,colorScale_entity_2 ,colorScale_link , uniqueLinks }) => {
+
   return (
     <>
       <div className='legend'>
@@ -12,7 +12,7 @@ const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale , uniqueLinks })
     {uniqueClasses.map((entity_1_li, index) => (
       <li key={index }  className='ml-6'>
          <span className="circle"  style={{
-                backgroundColor: colorScale(entity_1_li),
+                backgroundColor: colorScale_entity_1(entity_1_li),
               }}></span> {entity_1_li}
       </li>
     ))}
@@ -22,7 +22,7 @@ const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale , uniqueLinks })
     {uniqueClasses2.map((entity_2_li, index) => (
       <li key={index} className='ml-6'>
         <span className="circle"  style={{
-                backgroundColor: colorScale(entity_2_li),
+                backgroundColor: colorScale_entity_2(entity_2_li),
               }}></span> {entity_2_li}
       </li>
     ))}
@@ -31,9 +31,10 @@ const LegendData = ({ uniqueClasses, uniqueClasses2 ,colorScale , uniqueLinks })
   <ul className='ml-1'>
     <li className='entity_1 font-semibold'> Link Type</li>
     {uniqueLinks.map((link_type, index) => (
+    
       <li key={index }  className='ml-6'>
          <span className="line"  style={{
-                backgroundColor: colorScale(link_type),
+                backgroundColor: colorScale_link(link_type),
               }}></span> {link_type}
       </li>
     ))}

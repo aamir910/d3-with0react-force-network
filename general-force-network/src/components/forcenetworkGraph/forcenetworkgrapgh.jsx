@@ -11,8 +11,8 @@ const ForceDirectedGraph = () => {
   const svgRef = useRef();
   const [uniqueClasses, setUniqueClasses] = useState([]);
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
-  
   const [uniqueLinks, setUniqueLinks] = useState([]);
+
   const colors = [
     "red",
     "blue",
@@ -28,7 +28,6 @@ const ForceDirectedGraph = () => {
     "olive", "maroon",
     "aquamarine", "coral",  "gold", "silver", "violet",
   ];
-
 
   useEffect(() => {
     const width = 600;
@@ -76,6 +75,7 @@ const ForceDirectedGraph = () => {
       source: item.entity_1,
       target: item.entity_2,
       value: item.link_strength,
+      type  : item.Link_Type
       
     }));
 
@@ -86,10 +86,25 @@ const ForceDirectedGraph = () => {
       .style("display", "block")
       .style("margin", "auto");
 
-    const colorScale = d3
+
+    const colorScale_entity_1 = d3
       .scaleOrdinal()
       .domain([...uniqueClassesTemp])
       .range(colors);
+
+      const colorScale_entity_2 = d3
+      .scaleOrdinal()
+      .domain([...uniqueClasses2Temp])
+      .range(colors);
+
+      const colorScale_link = d3
+      .scaleOrdinal()
+      .domain([...uniqLinkTemp])
+      .range(colors);
+
+console.log(uniqueClassesTemp ,'here are the temp classes')
+
+
 
     const simulation = d3
       .forceSimulation(nodes)
@@ -104,13 +119,18 @@ const ForceDirectedGraph = () => {
       .force("center", d3.forceCenter(width, height))
       .force("collide", d3.forceCollide().radius(10)); // Add forceCollide;
 
+
     const link = svg
       .selectAll("line")
       .data(links)
       .enter()
       .append("line")
-      .attr("stroke", "#ccc")
-      .attr("stroke-width", 2);
+      // .attr("stroke", "#ccc")
+      .attr("stroke-width", 2)
+      .attr("stroke", (d) =>{
+console.log(d.type ,"here is the type")
+        
+        return colorScale_link(d.type)});
 
     let node;
 
@@ -136,7 +156,7 @@ const ForceDirectedGraph = () => {
       .attr("fill", (d) =>{
 
         
-        return colorScale(d.class)});
+        return colorScale_entity_1(d.class)});
 
     node
       .filter((d) => d.type === "entity_2")
@@ -144,9 +164,8 @@ const ForceDirectedGraph = () => {
       .attr("r", 10)
       .attr("fill", (d) =>{
 
-        console.log( colorScale(d.class),colorScale('Bone') , d ,'d is now here')
         
-        return colorScale(d.class)});
+        return colorScale_entity_2(d.class)});
 
     node
       .append("text")
@@ -212,10 +231,18 @@ const ForceDirectedGraph = () => {
             uniqueClasses={uniqueClasses}
             uniqueClasses2={uniqueClasses2}
             uniqueLinks ={uniqueLinks}
-            colorScale ={d3
+            colorScale_entity_1 ={d3
             .scaleOrdinal()
             .domain([...uniqueClasses])
             .range(colors)}
+            colorScale_entity_2 ={d3
+              .scaleOrdinal()
+              .domain([...uniqueClasses2])
+              .range(colors)}
+              colorScale_link ={d3
+                .scaleOrdinal()
+                .domain([...uniqueLinks])
+                .range(colors)}
           />
         </div>
       </div>
