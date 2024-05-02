@@ -2,16 +2,23 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useLocation } from "react-router-dom";
 import LegendData from "./LegendData";
-import { Container, Row, Col } from "react-bootstrap";
 import Example from "./Navbar";
 
 const ForceDirectedGraph = () => {
   const location = useLocation();
   const { jsondata } = location.state;
   const svgRef = useRef();
+
+  const [doneItems2, setDoneItems2] = useState([]);
+console.log(doneItems2 ,'here is the doneitems22')
   const [uniqueClasses, setUniqueClasses] = useState([]);
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
   const [uniqueLinks, setUniqueLinks] = useState([]);
+  const [colorScales, setColorScales] = useState({
+    entity_1: null,
+    entity_2: null,
+    link: null
+  });
 
   const colors = [
     "red",
@@ -20,13 +27,30 @@ const ForceDirectedGraph = () => {
     "yellow",
     "orange",
     "purple",
-    "pink",  "cyan",
-    "magenta",  "lime",
+    "pink",
+    "cyan",
+    "magenta",
+    "lime",
     "teal",
     "brown",
     "navy",
-    "olive", "maroon",
-    "aquamarine", "coral",  "gold", "silver", "violet",
+    "olive",
+    "maroon",
+    "aquamarine",
+    "coral",
+    "gold",
+    "silver",
+    "violet"
+  ];
+  const color_link = [
+    "grey",
+    "pink",
+    "cyan",
+    "magenta",
+    "lime",
+    "teal",
+    "brown",
+    "navy"
   ];
 
   useEffect(() => {
@@ -35,7 +59,7 @@ const ForceDirectedGraph = () => {
     let nodes = [];
     let uniqueClassesTemp = [];
     let uniqueClasses2Temp = [];
-    let uniqLinkTemp = []
+    let uniqLinkTemp = [];
     let uniqueNodes = new Set();
 
     jsondata.forEach((item) => {
@@ -47,6 +71,7 @@ const ForceDirectedGraph = () => {
       }
       if (!uniqLinkTemp.includes(item.Link_Type)) {
         uniqLinkTemp.push(item.Link_Type);
+        console.log('item.Link_Type item.Link_Type' ,item.Link_Type)
       }
 
       if (!uniqueNodes.has(item.entity_1)) {
@@ -54,7 +79,7 @@ const ForceDirectedGraph = () => {
         nodes.push({
           name: item.entity_1,
           class: item.entity_1_class,
-          type: "entity_1",
+          type: "entity_1"
         });
       }
       if (!uniqueNodes.has(item.entity_2)) {
@@ -62,21 +87,20 @@ const ForceDirectedGraph = () => {
         nodes.push({
           name: item.entity_2,
           class: item.entity_2_class,
-          type: "entity_2",
+          type: "entity_2"
         });
       }
     });
 
     setUniqueClasses(uniqueClassesTemp);
     setUniqueClasses2(uniqueClasses2Temp);
-    setUniqueLinks(uniqLinkTemp) ; 
+    setUniqueLinks(uniqLinkTemp);
 
     const links = jsondata.map((item) => ({
       source: item.entity_1,
       target: item.entity_2,
       value: item.link_strength,
-      type  : item.Link_Type
-      
+      type: item.Link_Type
     }));
 
     const svg = d3
@@ -86,26 +110,27 @@ const ForceDirectedGraph = () => {
       .style("display", "block")
       .style("margin", "auto");
 
-
     const colorScale_entity_1 = d3
       .scaleOrdinal()
       .domain([...uniqueClassesTemp])
       .range(colors);
 
-      const colorScale_entity_2 = d3
+    const colorScale_entity_2 = d3
       .scaleOrdinal()
       .domain([...uniqueClasses2Temp])
       .range(colors);
 
-      const colorScale_link = d3
+    const colorScale_link = d3
       .scaleOrdinal()
       .domain([...uniqLinkTemp])
-      .range(colors);
+      .range(color_link);
 
-console.log(uniqueClassesTemp ,'here are the temp classes')
-
-
-
+    setColorScales({
+      entity_1: colorScale_entity_1,
+      entity_2: colorScale_entity_2,
+      link: colorScale_link
+    });
+console.log(colorScales , 'colorscale use state')
     const simulation = d3
       .forceSimulation(nodes)
       .force(
@@ -119,18 +144,13 @@ console.log(uniqueClassesTemp ,'here are the temp classes')
       .force("center", d3.forceCenter(width, height))
       .force("collide", d3.forceCollide().radius(10)); // Add forceCollide;
 
-
     const link = svg
       .selectAll("line")
       .data(links)
       .enter()
       .append("line")
-      // .attr("stroke", "#ccc")
       .attr("stroke-width", 2)
-      .attr("stroke", (d) =>{
-console.log(d.type ,"here is the type")
-        
-        return colorScale_link(d.type)});
+      .attr("stroke", (d) => colorScale_link(d.type)); // Corrected line
 
     let node;
 
@@ -147,36 +167,31 @@ console.log(d.type ,"here is the type")
           .on("drag", dragged)
           .on("end", dragended)
       );
-
+console.log(node , ' here are the d3 node')
     node
       .filter((d) => d.type === "entity_1")
       .append("rect")
       .attr("width", 30)
       .attr("height", 20)
-      .attr("fill", (d) =>{
-
-        
-        return colorScale_entity_1(d.class)});
+      .attr("fill", (d) => colorScale_entity_1(d.class));
 
     node
       .filter((d) => d.type === "entity_2")
       .append("circle")
       .attr("r", 10)
-      .attr("fill", (d) =>{
-
-        
-        return colorScale_entity_2(d.class)});
+      .attr("fill", (d) => colorScale_entity_2(d.class));
 
     node
       .append("text")
       .text((d) => d.name)
       .attr("dx", 6)
-      .attr("dy", 0)
       .style("font-size", "12.208px")
       .style("font-family", "Arial")
       .attr("text-anchor", "middle")
       .style("fill", "black")
       .attr("dy", "1.5rem");
+
+
 
     const svgWidth = +svg.node().getBoundingClientRect().width;
     const svgHeight = +svg.node().getBoundingClientRect().height;
@@ -189,8 +204,11 @@ console.log(d.type ,"here is the type")
         .attr("y2", (d) => d.target.y);
       node.attr(
         "transform",
-        (d) => `translate(${Math.max(0, Math.min(svgWidth, d.x))}
-      ,${Math.max(0, Math.min(svgHeight, d.y))})`
+        (d) =>
+          `translate(${Math.max(0, Math.min(svgWidth, d.x))},${Math.max(
+            0,
+            Math.min(svgHeight, d.y)
+          )})`
       );
     });
 
@@ -230,20 +248,14 @@ console.log(d.type ,"here is the type")
           <LegendData
             uniqueClasses={uniqueClasses}
             uniqueClasses2={uniqueClasses2}
-            uniqueLinks ={uniqueLinks}
-            colorScale_entity_1 ={d3
-            .scaleOrdinal()
-            .domain([...uniqueClasses])
-            .range(colors)}
-            colorScale_entity_2 ={d3
-              .scaleOrdinal()
-              .domain([...uniqueClasses2])
-              .range(colors)}
-              colorScale_link ={d3
-                .scaleOrdinal()
-                .domain([...uniqueLinks])
-                .range(colors)}
+            uniqueLinks={uniqueLinks}
+            colorScale_entity_1={colorScales.entity_1}
+            colorScale_entity_2={colorScales.entity_2}
+            colorScale_link={colorScales.link}
+            // doneItems2 = {doneItems2}
+            setDoneItems2 = {setDoneItems2}
           />
+          
         </div>
       </div>
     </>
