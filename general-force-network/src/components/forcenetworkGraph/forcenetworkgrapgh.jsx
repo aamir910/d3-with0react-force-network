@@ -1,17 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useLocation } from "react-router-dom";
-import LegendData from "./LegendData";
 import Example from "./Navbar";
+import '../../cssFiles/legend.css'
 
 const ForceDirectedGraph = () => {
+  let bool = true;
+
   const location = useLocation();
+
   const { jsondata } = location.state;
+
   const svgRef = useRef();
 
-  const [doneItems2, setDoneItems2] = useState([]);
-console.log(doneItems2 ,'here is the doneitems22')
+
+  const [doneItems2, setDoneItems2] = useState(['bone','skin','Lung']);
+  
   const [uniqueClasses, setUniqueClasses] = useState([]);
+
+
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
   const [uniqueLinks, setUniqueLinks] = useState([]);
   const [colorScales, setColorScales] = useState({
@@ -52,14 +59,17 @@ console.log(doneItems2 ,'here is the doneitems22')
     "brown",
     "navy"
   ];
-
+  let node;
+  let nodes = [];
+  let uniqueClassesTemp = [];
+  let uniqueClasses2Temp = [];
+  let uniqLinkTemp = [];
   useEffect(() => {
+    if(bool){
+
+  
     const width = 600;
     const height = 400;
-    let nodes = [];
-    let uniqueClassesTemp = [];
-    let uniqueClasses2Temp = [];
-    let uniqLinkTemp = [];
     let uniqueNodes = new Set();
 
     jsondata.forEach((item) => {
@@ -71,7 +81,6 @@ console.log(doneItems2 ,'here is the doneitems22')
       }
       if (!uniqLinkTemp.includes(item.Link_Type)) {
         uniqLinkTemp.push(item.Link_Type);
-        console.log('item.Link_Type item.Link_Type' ,item.Link_Type)
       }
 
       if (!uniqueNodes.has(item.entity_1)) {
@@ -130,7 +139,7 @@ console.log(doneItems2 ,'here is the doneitems22')
       entity_2: colorScale_entity_2,
       link: colorScale_link
     });
-console.log(colorScales , 'colorscale use state')
+
     const simulation = d3
       .forceSimulation(nodes)
       .force(
@@ -142,7 +151,7 @@ console.log(colorScales , 'colorscale use state')
       )
       .force("charge", d3.forceManyBody().strength(-50))
       .force("center", d3.forceCenter(width, height))
-      .force("collide", d3.forceCollide().radius(10)); // Add forceCollide;
+      .force("collide", d3.forceCollide().radius(10)); 
 
     const link = svg
       .selectAll("line")
@@ -150,9 +159,9 @@ console.log(colorScales , 'colorscale use state')
       .enter()
       .append("line")
       .attr("stroke-width", 2)
-      .attr("stroke", (d) => colorScale_link(d.type)); // Corrected line
+      .attr("stroke", (d) => colorScale_link(d.type)); 
 
-    let node;
+   
 
     node = svg
       .selectAll(".node")
@@ -167,7 +176,7 @@ console.log(colorScales , 'colorscale use state')
           .on("drag", dragged)
           .on("end", dragended)
       );
-console.log(node , ' here are the d3 node')
+
     node
       .filter((d) => d.type === "entity_1")
       .append("rect")
@@ -191,25 +200,24 @@ console.log(node , ' here are the d3 node')
       .style("fill", "black")
       .attr("dy", "1.5rem");
 
-
-
     const svgWidth = +svg.node().getBoundingClientRect().width;
     const svgHeight = +svg.node().getBoundingClientRect().height;
-
     simulation.on("tick", () => {
       link
         .attr("x1", (d) => d.source.x)
         .attr("y1", (d) => d.source.y)
         .attr("x2", (d) => d.target.x)
         .attr("y2", (d) => d.target.y);
-      node.attr(
-        "transform",
-        (d) =>
-          `translate(${Math.max(0, Math.min(svgWidth, d.x))},${Math.max(
-            0,
-            Math.min(svgHeight, d.y)
-          )})`
-      );
+      node
+        .attr(
+          "transform",
+          (d) =>
+            `translate(${Math.max(0, Math.min(svgWidth, d.x))},${Math.max(
+              0,
+              Math.min(svgHeight, d.y)
+            )})`
+        )
+     
     });
 
     function dragstarted(event) {
@@ -228,34 +236,118 @@ console.log(node , ' here are the d3 node')
       event.subject.fx = null;
       event.subject.fy = null;
     }
+    bool =false;
+    console.log('check1')
+  }
+  node
+  .style("display", (d) =>
+    doneItems2.includes(d.class) ? "none" : "block"
+  );
 
-    return () => simulation.stop();
-  }, [jsondata]);
+    console.log(doneItems2, 'check2'); 
+    // return () => simulation.stop();
+  }, [jsondata, doneItems2]); // <-- Add doneItems2 as a dependency
+ 
+  const handleClick = (item) => {
+    if (doneItems2.includes(item)) {
+      setDoneItems2(doneItems2.filter((doneItem) => doneItem !== item));
+    } else {
+      setDoneItems2([...doneItems2, item]);
+    
+    }
+  };
+
 
   return (
     <>
       <Example />
       <div className=" container mt-3  flex flex-col md:flex-row ">
-        {/* First column takes up 8/12 width on medium and larger screens */}
         <div className="w-full md:w-10/12">
           <h1 className=" text-3xl text-center md:text-left">
             Force Network Graph
           </h1>
           <svg ref={svgRef} className="  w-full h-auto"></svg>
         </div>
-        {/* Second column takes up 4/12 width on medium and larger screens bg-orange-100 */}
         <div className=" container m-1 w-full md:w-2/12">
-          <LegendData
-            uniqueClasses={uniqueClasses}
-            uniqueClasses2={uniqueClasses2}
-            uniqueLinks={uniqueLinks}
-            colorScale_entity_1={colorScales.entity_1}
-            colorScale_entity_2={colorScales.entity_2}
-            colorScale_link={colorScales.link}
-            // doneItems2 = {doneItems2}
-            setDoneItems2 = {setDoneItems2}
-          />
-          
+          <div className='legend'>
+            <h1 className='text-xl ml-2 font-bold'>Legend data</h1>
+            <ul className='ml-1'>
+              <li className='entity_1 font-semibold'> Entity 1 class</li>
+              {uniqueClasses.map((entity_1_li, index) => (
+                <li
+                  key={index}
+                  className='ml-6'
+                  style={{
+                    textDecoration: doneItems2.includes(entity_1_li) ? 'line-through' : 'none'
+                  }}
+                  onClick={() => handleClick(entity_1_li)}
+                >
+                  <span
+                    className="circle"
+                    style={{
+                      backgroundColor: colorScales.entity_1(entity_1_li),
+                      display: 'inline-block',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      marginRight: '5px'
+                    }}
+                  ></span>
+                  {entity_1_li}
+                </li>
+              ))}
+            </ul>
+            <ul className='ml-1' >
+              <li className='entity_2 font-semibold'> Entity 2 class</li>
+              {uniqueClasses2.map((entity_2_li, index) => (
+                <li
+                  key={index}
+                  className='ml-6'
+                  style={{
+                    textDecoration: doneItems2.includes(entity_2_li) ? 'line-through' : 'none'
+                  }}
+                  onClick={() => handleClick(entity_2_li)}
+                >
+                  <span
+                    className="circle"
+                    style={{
+                      backgroundColor: colorScales.entity_2(entity_2_li),
+                      display: 'inline-block',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      marginRight: '5px'
+                    }}
+                  ></span>
+                  {entity_2_li}
+                </li>
+              ))}
+            </ul>
+            <ul className='ml-1'>
+              <li className='entity_1 font-semibold'> Link Type</li>
+              {uniqueLinks.map((link_type, index) => (
+                <li
+                  key={index}
+                  className='ml-6'
+                  style={{
+                    textDecoration: doneItems2.includes(link_type) ? 'line-through' : 'none'
+                  }}
+                  onClick={() => handleClick(link_type)}
+                >
+                  <span
+                    className="line"
+                    style={{
+                      backgroundColor: colorScales.link(link_type),
+                      display: 'inline-block',
+                      width: '10px',
+                      height: '2px'
+                    }}
+                  ></span>
+                  {link_type}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </>

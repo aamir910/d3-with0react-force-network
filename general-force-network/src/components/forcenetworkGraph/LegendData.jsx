@@ -1,5 +1,5 @@
 import React, { useState , useEffect } from 'react';
-
+import '../../cssFiles/legend.css'
 const Legend = ({ 
   uniqueClasses,
   uniqueClasses2,
