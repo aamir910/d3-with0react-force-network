@@ -153,13 +153,17 @@ const ForceDirectedGraph = () => {
       .force("center", d3.forceCenter(width, height))
       .force("collide", d3.forceCollide().radius(10)); 
 
+
+      //creation of the links 
     const link = svg
       .selectAll("line")
       .data(links)
       .enter()
       .append("line")
       .attr("stroke-width", 2)
-      .attr("stroke", (d) => colorScale_link(d.type)); 
+      .attr("stroke", (d) => colorScale_link(d.type))
+      .attr('display', d => doneItems2.includes(d.target.class) ? 'none' : 'block');
+; 
 
    
 

@@ -32,7 +32,9 @@ const ForceGraph = ({ data, width, height }) => {
       .enter().append('line')
       .attr('stroke', '#999')
       .attr('stroke-opacity', 0.6)
-      .attr('stroke-width', d => Math.sqrt(d.value));
+      .attr('stroke-width', d => Math.sqrt(d.value))
+      
+      .attr('display', d => selectedNodes.includes(d.target.id ||d.source.id ) ? 'none' : 'block');
 
     const node = svg.append('g')
       .attr('class', 'nodes')
