@@ -14,10 +14,9 @@ const ForceDirectedGraph = () => {
   const svgRef = useRef();
 
 
-  const [doneItems2, setDoneItems2] = useState(['bone','skin','Lung']);
-  
+  const [doneItems2, setDoneItems2] = useState([]);
   const [uniqueClasses, setUniqueClasses] = useState([]);
-
+  
 
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
   const [uniqueLinks, setUniqueLinks] = useState([]);
@@ -119,6 +118,7 @@ const ForceDirectedGraph = () => {
       .style("display", "block")
       .style("margin", "auto");
 
+      svg.selectAll('*').remove();
     const colorScale_entity_1 = d3
       .scaleOrdinal()
       .domain([...uniqueClassesTemp])
