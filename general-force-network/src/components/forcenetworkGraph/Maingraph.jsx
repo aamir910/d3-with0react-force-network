@@ -17,33 +17,27 @@ const ForceGraph = ({ data, width, height }) => {
   useEffect(() => {
     const svg = d3.select(svgRef.current);
 
-    // Clear SVG
-    svg.selectAll('*').remove();
-
     const simulation = d3.forceSimulation(data.nodes)
       .force('link', d3.forceLink(data.links).id(d => d.id))
       .force('charge', d3.forceManyBody().strength(-50))
       .force('center', d3.forceCenter(width / 2, height / 2));
 
-    const link = svg.append('g')
-      .attr('class', 'links')
+    const link = svg.select('.links')
       .selectAll('line')
       .data(data.links)
       .enter().append('line')
+      .attr('class', 'link')
       .attr('stroke', '#999')
       .attr('stroke-opacity', 0.6)
-      .attr('stroke-width', d => Math.sqrt(d.value))
-      
-      .attr('display', d => selectedNodes.includes(d.target.id ||d.source.id ) ? 'none' : 'block');
+      .attr('stroke-width', d => Math.sqrt(d.value));
 
-    const node = svg.append('g')
-      .attr('class', 'nodes')
+    const node = svg.select('.nodes')
       .selectAll('circle')
       .data(data.nodes)
       .enter().append('circle')
+      .attr('class', 'node')
       .attr('r', 5)
       .attr('fill', d => selectedNodes.includes(d.id) ? '#d62728' : '#1f77b4')
-      .attr('display', d => selectedNodes.includes(d.id) ? 'none' : 'block')
       .call(d3.drag()
         .on('start', dragstarted)
         .on('drag', dragged)
@@ -90,9 +84,19 @@ const ForceGraph = ({ data, width, height }) => {
     return () => simulation.stop();
   }, [data.links, data.nodes, height, selectedNodes, width]);
 
+  useEffect(() => {
+    d3.selectAll('.node')
+      .style('display', d => selectedNodes.includes(d.id) ? 'none' : 'block');
+    d3.selectAll('.link')
+      .style('display', d => selectedNodes.includes(d.source.id) || selectedNodes.includes(d.target.id) ? 'none' : 'block');
+  }, [selectedNodes]);
+
   return (
     <>
-      <svg ref={svgRef} width={width} height={height}></svg>
+      <svg ref={svgRef} width={width} height={height}>
+        <g className="links"></g>
+        <g className="nodes"></g>
+      </svg>
       <div id='legend'> 
         <h2>Legend</h2>
         <ul>

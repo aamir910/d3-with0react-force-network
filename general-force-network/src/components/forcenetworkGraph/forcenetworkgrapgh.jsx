@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useLocation } from "react-router-dom";
 import Example from "./Navbar";
-import '../../cssFiles/legend.css'
+import "../../cssFiles/legend.css";
 
 const ForceDirectedGraph = () => {
   let bool = true;
@@ -13,17 +13,15 @@ const ForceDirectedGraph = () => {
 
   const svgRef = useRef();
 
-
   const [doneItems2, setDoneItems2] = useState([]);
   const [uniqueClasses, setUniqueClasses] = useState([]);
-  
 
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
   const [uniqueLinks, setUniqueLinks] = useState([]);
   const [colorScales, setColorScales] = useState({
     entity_1: null,
     entity_2: null,
-    link: null
+    link: null,
   });
 
   const colors = [
@@ -46,7 +44,7 @@ const ForceDirectedGraph = () => {
     "coral",
     "gold",
     "silver",
-    "violet"
+    "violet",
   ];
   const color_link = [
     "grey",
@@ -56,7 +54,7 @@ const ForceDirectedGraph = () => {
     "lime",
     "teal",
     "brown",
-    "navy"
+    "navy",
   ];
   let node;
   let nodes = [];
@@ -64,203 +62,206 @@ const ForceDirectedGraph = () => {
   let uniqueClasses2Temp = [];
   let uniqLinkTemp = [];
   useEffect(() => {
-    if(bool){
+    if (bool) {
+      const width = 600;
+      const height = 400;
+      let uniqueNodes = new Set();
+      console.log(jsondata, "here is the json data ");
+      jsondata.forEach((item) => {
+        if (!uniqueClassesTemp.includes(item.entity_1_class)) {
+          uniqueClassesTemp.push(item.entity_1_class);
+        }
+        if (!uniqueClasses2Temp.includes(item.entity_2_class)) {
+          uniqueClasses2Temp.push(item.entity_2_class);
+        }
+        if (!uniqLinkTemp.includes(item.Link_Type)) {
+          uniqLinkTemp.push(item.Link_Type);
+        }
 
-  
-    const width = 600;
-    const height = 400;
-    let uniqueNodes = new Set();
+        if (!uniqueNodes.has(item.entity_1)) {
+          uniqueNodes.add(item.entity_1);
+          nodes.push({
+            name: item.entity_1,
+            class: item.entity_1_class,
+            type: "entity_1",
+          });
+        }
+        if (!uniqueNodes.has(item.entity_2)) {
+          uniqueNodes.add(item.entity_2);
+          nodes.push({
+            name: item.entity_2,
+            class: item.entity_2_class,
+            type: "entity_2",
+          });
+        }
+      });
 
-    jsondata.forEach((item) => {
-      if (!uniqueClassesTemp.includes(item.entity_1_class)) {
-        uniqueClassesTemp.push(item.entity_1_class);
-      }
-      if (!uniqueClasses2Temp.includes(item.entity_2_class)) {
-        uniqueClasses2Temp.push(item.entity_2_class);
-      }
-      if (!uniqLinkTemp.includes(item.Link_Type)) {
-        uniqLinkTemp.push(item.Link_Type);
-      }
+      setUniqueClasses(uniqueClassesTemp);
+      setUniqueClasses2(uniqueClasses2Temp);
+      setUniqueLinks(uniqLinkTemp);
 
-      if (!uniqueNodes.has(item.entity_1)) {
-        uniqueNodes.add(item.entity_1);
-        nodes.push({
-          name: item.entity_1,
-          class: item.entity_1_class,
-          type: "entity_1"
-        });
-      }
-      if (!uniqueNodes.has(item.entity_2)) {
-        uniqueNodes.add(item.entity_2);
-        nodes.push({
-          name: item.entity_2,
-          class: item.entity_2_class,
-          type: "entity_2"
-        });
-      }
-    });
+      const links = jsondata.map((item) => ({
+        source: item.entity_1,
+        target: item.entity_2,
+        value: item.link_strength,
+        type: item.Link_Type,
+      }));
 
-    setUniqueClasses(uniqueClassesTemp);
-    setUniqueClasses2(uniqueClasses2Temp);
-    setUniqueLinks(uniqLinkTemp);
+      const svg = d3
+        .select(svgRef.current)
+        .attr("width", width)
+        .attr("height", height)
+        .style("display", "block")
+        .style("margin", "auto");
 
-    const links = jsondata.map((item) => ({
-      source: item.entity_1,
-      target: item.entity_2,
-      value: item.link_strength,
-      type: item.Link_Type
-    }));
+      svg.selectAll("*").remove();
+      const colorScale_entity_1 = d3
+        .scaleOrdinal()
+        .domain([...uniqueClassesTemp])
+        .range(colors);
 
-    const svg = d3
-      .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .style("display", "block")
-      .style("margin", "auto");
+      const colorScale_entity_2 = d3
+        .scaleOrdinal()
+        .domain([...uniqueClasses2Temp])
+        .range(colors);
 
-      svg.selectAll('*').remove();
-    const colorScale_entity_1 = d3
-      .scaleOrdinal()
-      .domain([...uniqueClassesTemp])
-      .range(colors);
+      const colorScale_link = d3
+        .scaleOrdinal()
+        .domain([...uniqLinkTemp])
+        .range(color_link);
 
-    const colorScale_entity_2 = d3
-      .scaleOrdinal()
-      .domain([...uniqueClasses2Temp])
-      .range(colors);
+      setColorScales({
+        entity_1: colorScale_entity_1,
+        entity_2: colorScale_entity_2,
+        link: colorScale_link,
+      });
 
-    const colorScale_link = d3
-      .scaleOrdinal()
-      .domain([...uniqLinkTemp])
-      .range(color_link);
+      const simulation = d3
+        .forceSimulation(nodes)
+        .force(
+          "link",
+          d3
+            .forceLink(links)
+            .id((d) => d.name)
+            .distance(100)
+        )
+        .force("charge", d3.forceManyBody().strength(-50))
+        .force("center", d3.forceCenter(width, height))
+        .force("collide", d3.forceCollide().radius(10));
 
-    setColorScales({
-      entity_1: colorScale_entity_1,
-      entity_2: colorScale_entity_2,
-      link: colorScale_link
-    });
+      //creation of the links
+      const link = svg
+        .selectAll("line")
+        .data(links)
+        .enter()
+        .append("line")
+        .attr("stroke-width", 2)
+        .attr("stroke", (d) => colorScale_link(d.type));
 
-    const simulation = d3
-      .forceSimulation(nodes)
-      .force(
-        "link",
-        d3
-          .forceLink(links)
-          .id((d) => d.name)
-          .distance(100)
-      )
-      .force("charge", d3.forceManyBody().strength(-50))
-      .force("center", d3.forceCenter(width, height))
-      .force("collide", d3.forceCollide().radius(10)); 
+      //  link custom filteration here is
+      // link.attr('display', d => doneItems2.includes(d.target.class) ? 'none' : 'block');
 
+      //  link custom filteration here is ended
+      node = svg
+        .selectAll(".node")
+        .data(nodes)
+        .enter()
+        .append("g")
+        .attr("class", "node")
+        .call(
+          d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        );
 
-      //creation of the links 
-    const link = svg
-      .selectAll("line")
-      .data(links)
-      .enter()
-      .append("line")
-      .attr("stroke-width", 2)
-      .attr("stroke", (d) => colorScale_link(d.type))
-      .attr('display', d => doneItems2.includes(d.target.class) ? 'none' : 'block');
-; 
-
-   
-
-    node = svg
-      .selectAll(".node")
-      .data(nodes)
-      .enter()
-      .append("g")
-      .attr("class", "node")
-      .call(
-        d3
-          .drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended)
-      );
-
-    node
-      .filter((d) => d.type === "entity_1")
-      .append("rect")
-      .attr("width", 30)
-      .attr("height", 20)
-      .attr("fill", (d) => colorScale_entity_1(d.class));
-
-    node
-      .filter((d) => d.type === "entity_2")
-      .append("circle")
-      .attr("r", 10)
-      .attr("fill", (d) => colorScale_entity_2(d.class));
-
-    node
-      .append("text")
-      .text((d) => d.name)
-      .attr("dx", 6)
-      .style("font-size", "12.208px")
-      .style("font-family", "Arial")
-      .attr("text-anchor", "middle")
-      .style("fill", "black")
-      .attr("dy", "1.5rem");
-
-    const svgWidth = +svg.node().getBoundingClientRect().width;
-    const svgHeight = +svg.node().getBoundingClientRect().height;
-    simulation.on("tick", () => {
-      link
-        .attr("x1", (d) => d.source.x)
-        .attr("y1", (d) => d.source.y)
-        .attr("x2", (d) => d.target.x)
-        .attr("y2", (d) => d.target.y);
       node
-        .attr(
+        .filter((d) => d.type === "entity_1")
+        .append("rect")
+        .attr("width", 30)
+        .attr("height", 20)
+        .attr("fill", (d) => colorScale_entity_1(d.class));
+
+      node
+        .filter((d) => d.type === "entity_2")
+        .append("circle")
+        .attr("r", 10)
+        .attr("fill", (d) => colorScale_entity_2(d.class));
+
+      node
+        .append("text")
+        .text((d) => d.name)
+        .attr("dx", 6)
+        .style("font-size", "12.208px")
+        .style("font-family", "Arial")
+        .attr("text-anchor", "middle")
+        .style("fill", "black")
+        .attr("dy", "1.5rem");
+
+      const svgWidth = +svg.node().getBoundingClientRect().width;
+      const svgHeight = +svg.node().getBoundingClientRect().height;
+      simulation.on("tick", () => {
+        link
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
+        node.attr(
           "transform",
           (d) =>
             `translate(${Math.max(0, Math.min(svgWidth, d.x))},${Math.max(
               0,
               Math.min(svgHeight, d.y)
             )})`
-        )
-     
-    });
+        );
+      });
 
-    function dragstarted(event) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      event.subject.fx = event.subject.x;
-      event.subject.fy = event.subject.y;
+      function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+
+      function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+      bool = false;
+      console.log("check1");
     }
 
-    function dragged(event) {
-      event.subject.fx = event.x;
-      event.subject.fy = event.y;
-    }
-
-    function dragended(event) {
-      if (!event.active) simulation.alphaTarget(0);
-      event.subject.fx = null;
-      event.subject.fy = null;
-    }
-    bool =false;
-    console.log('check1')
-  }
-  node
-  .style("display", (d) =>
-    doneItems2.includes(d.class) ? "none" : "block"
-  );
-
-    console.log(doneItems2, 'check2'); 
+    console.log(doneItems2, "check2");
     // return () => simulation.stop();
-  }, [jsondata, doneItems2]); // <-- Add doneItems2 as a dependency
- 
+  }, [jsondata]); // <-- Add doneItems2 as a dependency
+
+  useEffect(() => {
+    d3.selectAll(".node").style("display", (d) =>
+      doneItems2.includes(d.class) ? "none" : "block"
+    );
+    //  link custom filteration here is
+    d3.selectAll("line")
+    .style("display", (d) =>
+      doneItems2.includes(d.target.class) ? "none" : "block"
+    );
+  
+
+    //  link custom filteration here is ended
+  }, [doneItems2]);
+
   const handleClick = (item) => {
     if (doneItems2.includes(item)) {
       setDoneItems2(doneItems2.filter((doneItem) => doneItem !== item));
     } else {
       setDoneItems2([...doneItems2, item]);
-    
     }
   };
-
 
   return (
     <>
@@ -273,81 +274,85 @@ const ForceDirectedGraph = () => {
           <svg ref={svgRef} className="  w-full h-auto"></svg>
         </div>
         <div className=" container m-1 w-full md:w-2/12">
-          <div className='legend'>
-            <h1 className='text-xl ml-2 font-bold'>Legend data</h1>
-            <ul className='ml-1'>
-              <li className='entity_1 font-semibold'> Entity 1 class</li>
+          <div className="legend">
+            <h1 className="text-xl ml-2 font-bold">Legend data</h1>
+            <ul className="ml-1">
+              <li className="entity_1 font-semibold"> Entity 1 class</li>
               {uniqueClasses.map((entity_1_li, index) => (
                 <li
                   key={index}
-                  className='ml-6'
+                  className="ml-6"
                   style={{
-                    textDecoration: doneItems2.includes(entity_1_li) ? 'line-through' : 'none'
+                    textDecoration: doneItems2.includes(entity_1_li)
+                      ? "line-through"
+                      : "none",
                   }}
-                  onClick={() => handleClick(entity_1_li)}
-                >
+                  onClick={() => handleClick(entity_1_li)}>
                   <span
                     className="circle"
                     style={{
                       backgroundColor: colorScales.entity_1(entity_1_li),
-                      display: 'inline-block',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      marginRight: '5px'
-                    }}
-                  ></span>
-                  {entity_1_li}
+                      display: "inline-block",
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      marginRight: "5px",
+                    }}></span>
+                  <span onClick={() => handleClick(entity_1_li)}>
+                    {entity_1_li}
+                  </span>
                 </li>
               ))}
             </ul>
-            <ul className='ml-1' >
-              <li className='entity_2 font-semibold'> Entity 2 class</li>
+            <ul className="ml-1">
+              <li className="entity_2 font-semibold"> Entity 2 class</li>
               {uniqueClasses2.map((entity_2_li, index) => (
                 <li
                   key={index}
-                  className='ml-6'
+                  className="ml-6"
                   style={{
-                    textDecoration: doneItems2.includes(entity_2_li) ? 'line-through' : 'none'
-                  }}
-                  onClick={() => handleClick(entity_2_li)}
-                >
+                    textDecoration: doneItems2.includes(entity_2_li)
+                      ? "line-through"
+                      : "none",
+                  }}>
                   <span
                     className="circle"
                     style={{
                       backgroundColor: colorScales.entity_2(entity_2_li),
-                      display: 'inline-block',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      marginRight: '5px'
-                    }}
-                  ></span>
-                  {entity_2_li}
+                      display: "inline-block",
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      marginRight: "5px",
+                    }}></span>
+                  <span onClick={() => handleClick(entity_2_li)}>
+                    {entity_2_li}
+                  </span>
                 </li>
               ))}
             </ul>
-            <ul className='ml-1'>
-              <li className='entity_1 font-semibold'> Link Type</li>
+            <ul className="ml-1">
+              <li className="entity_1 font-semibold"> Link Type</li>
               {uniqueLinks.map((link_type, index) => (
                 <li
                   key={index}
-                  className='ml-6'
+                  className="ml-6"
                   style={{
-                    textDecoration: doneItems2.includes(link_type) ? 'line-through' : 'none'
-                  }}
-                  onClick={() => handleClick(link_type)}
-                >
+                    textDecoration: doneItems2.includes(link_type)
+                      ? "line-through"
+                      : "none",
+                  }}>
                   <span
                     className="line"
                     style={{
                       backgroundColor: colorScales.link(link_type),
-                      display: 'inline-block',
-                      width: '10px',
-                      height: '2px'
-                    }}
-                  ></span>
-                  {link_type}
+                      display: "inline-block",
+                      width: "10px",
+                      height: "2px",
+                    }}></span>
+                  <span onClick={() => handleClick(link_type)}>
+                    {link_type}
+                  </span>
                 </li>
               ))}
             </ul>
