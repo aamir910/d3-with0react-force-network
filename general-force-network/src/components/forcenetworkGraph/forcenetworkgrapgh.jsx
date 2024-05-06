@@ -217,24 +217,23 @@ const ForceDirectedGraph = () => {
         );
       });
 
-      function dragstarted(event) {
+      function dragstarted(event, d) {
+        // if (d !== selectedNode) return; // Allow dragging only for the selected node
         if (!event.active) simulation.alphaTarget(0.3).restart();
-        event.subject.fx = event.subject.x;
-        event.subject.fy = event.subject.y;
       }
 
-      function dragged(event) {
-        event.subject.fx = event.x;
-        event.subject.fy = event.y;
+      function dragged(event, d) {
+        // if (d !== selectedNode) return; // Allow dragging only for the selected node
+        d.fx = event.x;
+        d.fy = event.y;
       }
 
-      function dragended(event) {
+      function dragended(event, d) {
+        // if (d !== selectedNode) return; // Allow dragging only for the selected node
         if (!event.active) simulation.alphaTarget(0);
-        event.subject.fx = null;
-        event.subject.fy = null;
       }
+
       bool = false;
-      console.log("check1");
     }
 
     console.log(doneItems2, "check2");
@@ -254,6 +253,7 @@ const ForceDirectedGraph = () => {
 
     //  link custom filteration here is ended
   }, [doneItems2]);
+
 
   const handleClick = (item) => {
     if (doneItems2.includes(item)) {
