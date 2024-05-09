@@ -15,7 +15,6 @@ const ForceDirectedGraph = () => {
 
   const [doneItems2, setDoneItems2] = useState([]);
   const [uniqueClasses, setUniqueClasses] = useState([]);
-
   const [uniqueClasses2, setUniqueClasses2] = useState([]);
   const [uniqueLinks, setUniqueLinks] = useState([]);
   const [colorScales, setColorScales] = useState({
@@ -245,15 +244,12 @@ const ForceDirectedGraph = () => {
       doneItems2.includes(d.class) ? "none" : "block"
     );
     //  link custom filteration here is
-    d3.selectAll("line")
-    .style("display", (d) =>
+    d3.selectAll("line").style("display", (d) =>
       doneItems2.includes(d.target.class) ? "none" : "block"
     );
-  
 
     //  link custom filteration here is ended
   }, [doneItems2]);
-
 
   const handleClick = (item) => {
     if (doneItems2.includes(item)) {
@@ -271,6 +267,49 @@ const ForceDirectedGraph = () => {
           <h1 className=" text-3xl text-center md:text-left">
             Force Network Graph
           </h1>
+          {/* Price input component */}
+          <div className="price-input">
+            <div className="field">
+              <span>Min</span>
+              <input
+                type="number"
+                className="input-min"
+                value="6.0"
+                step="0.1"
+              />
+            </div>
+            <div className="separator">-</div>
+            <div className="field">
+              <span>Max</span>
+              <input
+                type="number"
+                className="input-max"
+                value="9.0"
+                step="0.1"
+              />
+            </div>
+          </div>
+          <div className="range-input">
+            <input
+              id="min_slider"
+              type="range"
+              className="range-min"
+              min="4.0"
+              max="9.0"
+              step="0.1"
+              value="6.0"
+            />
+            <input
+              id="max_slider"
+              type="range"
+              className="range-max"
+              min="4.0"
+              max="9.0"
+              step="0.1"
+              value="9.0"
+            />
+          </div>
+
           <svg ref={svgRef} className="  w-full h-auto"></svg>
         </div>
         <div className=" container m-1 w-full md:w-2/12">
