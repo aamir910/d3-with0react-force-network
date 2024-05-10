@@ -67,7 +67,6 @@ const YourComponent = () => {
         <input id="min_slider" type="range" className="range-min" min="4.0" max="9.0" step="0.1" value={minRange} onChange={handleRangeInputChange} />
         <input id="max_slider" type="range" className="range-max" min="4.0" max="9.0" step="0.1" value={maxRange} onChange={handleRangeInputChange} />
       </div>
-      <legend>Your Legend Here</legend>
     </div>
   );
 };
