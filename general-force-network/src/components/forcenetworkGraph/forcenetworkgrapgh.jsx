@@ -66,6 +66,7 @@ const ForceDirectedGraph = () => {
       const height = 400;
       let uniqueNodes = new Set();
       console.log(jsondata, "here is the json data ");
+    
       jsondata.forEach((item) => {
         if (!uniqueClassesTemp.includes(item.entity_1_class)) {
           uniqueClassesTemp.push(item.entity_1_class);
@@ -259,14 +260,25 @@ const ForceDirectedGraph = () => {
     }
   };
 
+
   // here is the functionality of the double sided slider 
-  
-  const [minPrice, setMinPrice] = useState(6.0);
-  const [maxPrice, setMaxPrice] = useState(9.0);
-  const [minRange, setMinRange] = useState(6.0);
-  const [maxRange, setMaxRange] = useState(9.0);
+
+  let linkStrengthValues = jsondata.map(item => parseFloat(item.link_strength));
+
+// Find the minimum and maximum values
+let minStrength = Math.min(...linkStrengthValues);
+let maxStrength = Math.max(...linkStrengthValues);
+
+console.log("Minimum link strength:", minStrength);
+console.log("Maximum link strength:", maxStrength);
+
+  const [minPrice, setMinPrice] = useState(minStrength);
+  const [maxPrice, setMaxPrice] = useState(maxStrength);
+  const [minRange, setMinRange] = useState(minStrength);
+  const [maxRange, setMaxRange] = useState(maxStrength);
 
   const priceGap = 0.1;
+  
 
   const handlePriceInputChange = (e) => {
     const inputName = e.target.className;
@@ -306,7 +318,9 @@ const ForceDirectedGraph = () => {
     left: `${((minPrice / parseFloat(maxRange)) * 100)}%`,
     right: `${100 - ((maxPrice / parseFloat(maxRange)) * 100)}%`
   };
+ // here is the functionality of the double sided slider ended 
 
+ 
 
   return (
     <>
@@ -340,7 +354,7 @@ const ForceDirectedGraph = () => {
         <div className="progress" style={rangeStyle}></div>
       </div>
       <div className="range-input">
-        <input id="min_slider" type="range" className="range-min" min="4.0" max="9.0" step="0.1" value={minRange} onChange={handleRangeInputChange} />
+        <input id="min_slider" type="range" className="range-min" min={minStrength} max={maxStrength} step="0.1" value={minRange} onChange={handleRangeInputChange} />
         <input id="max_slider" type="range" className="range-max" min="4.0" max="9.0" step="0.1" value={maxRange} onChange={handleRangeInputChange} />
       </div>
     </div>
