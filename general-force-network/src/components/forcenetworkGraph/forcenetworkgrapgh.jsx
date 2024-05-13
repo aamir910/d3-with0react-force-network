@@ -265,9 +265,20 @@ const ForceDirectedGraph = () => {
 
   let linkStrengthValues = jsondata.map(item => parseFloat(item.link_strength));
 
-// Find the minimum and maximum values
-let minStrength = Math.min(...linkStrengthValues);
-let maxStrength = Math.max(...linkStrengthValues);
+  // Find the minimum and maximum values
+  let minStrength = Math.min(...linkStrengthValues);
+  let maxStrength = Math.max(...linkStrengthValues);
+  
+  const LinkGap = 0.1;
+
+  
+  let Linkstep ;
+  if(maxStrength - minStrength >9 ){
+    Linkstep = 1.0;
+  }
+  else{
+    Linkstep = 0.1;
+  }
 
 console.log("Minimum link strength:", minStrength);
 console.log("Maximum link strength:", maxStrength);
@@ -277,7 +288,6 @@ console.log("Maximum link strength:", maxStrength);
   const [minRange, setMinRange] = useState(minStrength);
   const [maxRange, setMaxRange] = useState(maxStrength);
 
-  const priceGap = 0.1;
   
 
   const handlePriceInputChange = (e) => {
@@ -285,12 +295,12 @@ console.log("Maximum link strength:", maxStrength);
     const inputValue = parseFloat(e.target.value);
 
     if (inputName === "input-min") {
-      if (maxPrice - inputValue >= priceGap && inputValue >= parseFloat(minRange)) {
+      if (maxPrice - inputValue >= LinkGap && inputValue >= parseFloat(minRange)) {
         setMinPrice(inputValue);
         setMinRange(inputValue);
       }
     } else {
-      if (inputValue - minPrice >= priceGap && inputValue <= parseFloat(maxRange)) {
+      if (inputValue - minPrice >= LinkGap && inputValue <= parseFloat(maxRange)) {
         setMaxPrice(inputValue);
         setMaxRange(inputValue);
       }
@@ -302,12 +312,12 @@ console.log("Maximum link strength:", maxStrength);
     const inputValue = parseFloat(e.target.value);
 
     if (inputName === "range-min") {
-      if (maxPrice - inputValue >= priceGap) {
+      if (maxPrice - inputValue >= LinkGap) {
         setMinRange(inputValue);
         setMinPrice(inputValue);
       }
     } else {
-      if (inputValue - minPrice >= priceGap) {
+      if (inputValue - minPrice >= LinkGap) {
         setMaxRange(inputValue);
         setMaxPrice(inputValue);
       }
@@ -342,12 +352,12 @@ console.log("Maximum link strength:", maxStrength);
       <div className="price-input">
         <div className="field">
           <span>Min</span>
-          <input type="number" className="input-min" value={minPrice} step="0.1" onChange={handlePriceInputChange} />
+          <input type="number" className="input-min" value={minPrice} step={ Linkstep }  onChange={handlePriceInputChange} />
         </div>
         <div className="separator">-</div>
         <div className="field">
           <span>Max</span>
-          <input type="number" className="input-max" value={maxPrice} step="0.1" onChange={handlePriceInputChange} />
+          <input type="number" className="input-max" value={maxPrice} step={ Linkstep } onChange={handlePriceInputChange} />
         </div>
       </div>
       <div className="slider">
@@ -355,7 +365,8 @@ console.log("Maximum link strength:", maxStrength);
       </div>
       <div className="range-input">
         <input id="min_slider" type="range" className="range-min" min={minStrength} max={maxStrength} step="0.1" value={minRange} onChange={handleRangeInputChange} />
-        <input id="max_slider" type="range" className="range-max" min="4.0" max="9.0" step="0.1" value={maxRange} onChange={handleRangeInputChange} />
+        <input id="max_slider" type="range" className="range-max" min="4.0" max="9.0"
+        step={Linkstep} value={maxRange} onChange={handleRangeInputChange} />
       </div>
     </div>
 
