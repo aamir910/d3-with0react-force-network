@@ -60,6 +60,74 @@ const ForceDirectedGraph = () => {
   let uniqueClassesTemp = [];
   let uniqueClasses2Temp = [];
   let uniqLinkTemp = [];
+// here is the functionality of the double sided slider 
+
+let linkStrengthValues = jsondata.map(item => parseFloat(item.link_strength));
+
+// Find the minimum and maximum values
+let minStrength = Math.min(...linkStrengthValues);
+let maxStrength = Math.max(...linkStrengthValues);
+
+const LinkGap = 0.1;
+
+
+let Linkstep ;
+if(maxStrength - minStrength >9 ){
+  Linkstep = 1.0;
+}
+else{
+  Linkstep = 0.1;
+}
+
+
+const [minPrice, setMinPrice] = useState(minStrength);
+const [maxPrice, setMaxPrice] = useState(maxStrength);
+const [minRange, setMinRange] = useState(minStrength);
+const [maxRange, setMaxRange] = useState(maxStrength);
+
+
+
+const handlePriceInputChange = (e) => {
+  const inputName = e.target.className;
+  const inputValue = parseFloat(e.target.value);
+
+  if (inputName === "input-min") {
+    if (maxPrice - inputValue >= LinkGap && inputValue >= parseFloat(minRange)) {
+      setMinPrice(inputValue);
+      setMinRange(inputValue);
+    }
+  } else {
+    if (inputValue - minPrice >= LinkGap && inputValue <= parseFloat(maxRange)) {
+      setMaxPrice(inputValue);
+      setMaxRange(inputValue);
+    }
+  }
+};
+
+const handleRangeInputChange = (e) => {
+  const inputName = e.target.className;
+  const inputValue = parseFloat(e.target.value);
+
+  if (inputName === "range-min") {
+    if (maxPrice - inputValue >= LinkGap) {
+      setMinRange(inputValue);
+      setMinPrice(inputValue);
+    }
+  } else {
+    if (inputValue - minPrice >= LinkGap) {
+      setMaxRange(inputValue);
+      setMaxPrice(inputValue);
+    }
+  }
+};
+
+const rangeStyle = {
+  left: `${((minPrice / parseFloat(maxRange)) * 100)}%`,
+  right: `${100 - ((maxPrice / parseFloat(maxRange)) * 100)}%`
+};
+// here is the functionality of the double sided slider ended 
+
+
   useEffect(() => {
     if (bool) {
       const width = 600;
@@ -243,7 +311,11 @@ const ForceDirectedGraph = () => {
 
   useEffect(() => {
 
-    
+  let filteredLinks = d3.selectAll("line").filter(link => {
+      // Filter links with a value greater than 5
+      return link.value < minRange || link.value > maxRange
+    });
+
     d3.selectAll(".node").style("display", (d) =>
       doneItems2.includes(d.class) ? "none" : "block"
     );
@@ -259,9 +331,10 @@ const ForceDirectedGraph = () => {
       }
     });
 
+     // Hide the filtered links
+     filteredLinks.style("display", "none");
 
-
-  }, [doneItems2]);
+  }, [doneItems2 , minRange , maxRange ]); 
 
 
 
@@ -275,73 +348,7 @@ const ForceDirectedGraph = () => {
   };
 
 
-  // here is the functionality of the double sided slider 
-
-  let linkStrengthValues = jsondata.map(item => parseFloat(item.link_strength));
-
-  // Find the minimum and maximum values
-  let minStrength = Math.min(...linkStrengthValues);
-  let maxStrength = Math.max(...linkStrengthValues);
   
-  const LinkGap = 0.1;
-
-  
-  let Linkstep ;
-  if(maxStrength - minStrength >9 ){
-    Linkstep = 1.0;
-  }
-  else{
-    Linkstep = 0.1;
-  }
-
-
-  const [minPrice, setMinPrice] = useState(minStrength);
-  const [maxPrice, setMaxPrice] = useState(maxStrength);
-  const [minRange, setMinRange] = useState(minStrength);
-  const [maxRange, setMaxRange] = useState(maxStrength);
-
-  
-
-  const handlePriceInputChange = (e) => {
-    const inputName = e.target.className;
-    const inputValue = parseFloat(e.target.value);
-
-    if (inputName === "input-min") {
-      if (maxPrice - inputValue >= LinkGap && inputValue >= parseFloat(minRange)) {
-        setMinPrice(inputValue);
-        setMinRange(inputValue);
-      }
-    } else {
-      if (inputValue - minPrice >= LinkGap && inputValue <= parseFloat(maxRange)) {
-        setMaxPrice(inputValue);
-        setMaxRange(inputValue);
-      }
-    }
-  };
-
-  const handleRangeInputChange = (e) => {
-    const inputName = e.target.className;
-    const inputValue = parseFloat(e.target.value);
-
-    if (inputName === "range-min") {
-      if (maxPrice - inputValue >= LinkGap) {
-        setMinRange(inputValue);
-        setMinPrice(inputValue);
-      }
-    } else {
-      if (inputValue - minPrice >= LinkGap) {
-        setMaxRange(inputValue);
-        setMaxPrice(inputValue);
-      }
-    }
-  };
-
-  const rangeStyle = {
-    left: `${((minPrice / parseFloat(maxRange)) * 100)}%`,
-    right: `${100 - ((maxPrice / parseFloat(maxRange)) * 100)}%`
-  };
- // here is the functionality of the double sided slider ended 
-
  
 
   return (
