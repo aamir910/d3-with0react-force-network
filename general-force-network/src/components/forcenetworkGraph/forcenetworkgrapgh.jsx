@@ -240,19 +240,33 @@ const ForceDirectedGraph = () => {
     // return () => simulation.stop();
   }, [jsondata]); // <-- Add doneItems2 as a dependency
 
+
   useEffect(() => {
+
+    
     d3.selectAll(".node").style("display", (d) =>
       doneItems2.includes(d.class) ? "none" : "block"
     );
-    //  link custom filteration here is
-    d3.selectAll("line").style("display", (d) =>
-      doneItems2.includes(d.target.class) ? "none" : "block"
-    );
+  
+    d3.selectAll("line").style("display", (d) => {
+      console.log(d)
+      if (doneItems2.includes(d.source.class) || doneItems2.includes(d.type) 
+        || doneItems2.includes(d.target.class) 
+       ) {
+        return "none";
+      } else {
+        return "block";
+      }
+    });
 
-    //  link custom filteration here is ended
+
+
   }, [doneItems2]);
 
+
+
   const handleClick = (item) => {
+
     if (doneItems2.includes(item)) {
       setDoneItems2(doneItems2.filter((doneItem) => doneItem !== item));
     } else {
@@ -280,8 +294,6 @@ const ForceDirectedGraph = () => {
     Linkstep = 0.1;
   }
 
-console.log("Minimum link strength:", minStrength);
-console.log("Maximum link strength:", maxStrength);
 
   const [minPrice, setMinPrice] = useState(minStrength);
   const [maxPrice, setMaxPrice] = useState(maxStrength);
