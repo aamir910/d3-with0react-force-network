@@ -46,7 +46,6 @@ const ForceDirectedGraph = () => {
     "violet",
   ];
 
-
   const color_link = [
     "grey",
     "pink",
@@ -58,79 +57,80 @@ const ForceDirectedGraph = () => {
     "navy",
   ];
 
-
   let node;
   let nodes = [];
   let uniqueClassesTemp = [];
   let uniqueClasses2Temp = [];
   let uniqLinkTemp = [];
-// here is the functionality of the double sided slider 
+  // here is the functionality of the double sided slider
 
-let linkStrengthValues = jsondata.map(item => parseFloat(item.link_strength));
+  let linkStrengthValues = jsondata.map((item) =>
+    parseFloat(item.link_strength)
+  );
 
-// Find the minimum and maximum values
-let minStrength = Math.min(...linkStrengthValues);
-let maxStrength = Math.max(...linkStrengthValues);
+  // Find the minimum and maximum values
+  let minStrength = Math.min(...linkStrengthValues);
+  let maxStrength = Math.max(...linkStrengthValues);
 
-const LinkGap = 0.1;
+  const LinkGap = 0.1;
 
-
-let Linkstep ;
-if(maxStrength - minStrength >9 ){
-  Linkstep = 1.0;
-}
-else{
-  Linkstep = 0.1;
-}
-
-
-const [minPrice, setMinPrice] = useState(minStrength);
-const [maxPrice, setMaxPrice] = useState(maxStrength);
-const [minRange, setMinRange] = useState(minStrength);
-const [maxRange, setMaxRange] = useState(maxStrength);
-
-
-
-const handlePriceInputChange = (e) => {
-  const inputName = e.target.className;
-  const inputValue = parseFloat(e.target.value);
-
-  if (inputName === "input-min") {
-    if (maxPrice - inputValue >= LinkGap && inputValue >= parseFloat(minRange)) {
-      setMinPrice(inputValue);
-      setMinRange(inputValue);
-    }
+  let Linkstep;
+  if (maxStrength - minStrength > 9) {
+    Linkstep = 1.0;
   } else {
-    if (inputValue - minPrice >= LinkGap && inputValue <= parseFloat(maxRange)) {
-      setMaxPrice(inputValue);
-      setMaxRange(inputValue);
-    }
+    Linkstep = 0.1;
   }
-};
 
-const handleRangeInputChange = (e) => {
-  const inputName = e.target.className;
-  const inputValue = parseFloat(e.target.value);
+  const [minPrice, setMinPrice] = useState(minStrength);
+  const [maxPrice, setMaxPrice] = useState(maxStrength);
+  const [minRange, setMinRange] = useState(minStrength);
+  const [maxRange, setMaxRange] = useState(maxStrength);
 
-  if (inputName === "range-min") {
-    if (maxPrice - inputValue >= LinkGap) {
-      setMinRange(inputValue);
-      setMinPrice(inputValue);
+  const handlePriceInputChange = (e) => {
+    const inputName = e.target.className;
+    const inputValue = parseFloat(e.target.value);
+
+    if (inputName === "input-min") {
+      if (
+        maxPrice - inputValue >= LinkGap &&
+        inputValue >= parseFloat(minRange)
+      ) {
+        setMinPrice(inputValue);
+        setMinRange(inputValue);
+      }
+    } else {
+      if (
+        inputValue - minPrice >= LinkGap &&
+        inputValue <= parseFloat(maxRange)
+      ) {
+        setMaxPrice(inputValue);
+        setMaxRange(inputValue);
+      }
     }
-  } else {
-    if (inputValue - minPrice >= LinkGap) {
-      setMaxRange(inputValue);
-      setMaxPrice(inputValue);
+  };
+
+  const handleRangeInputChange = (e) => {
+    const inputName = e.target.className;
+    const inputValue = parseFloat(e.target.value);
+
+    if (inputName === "range-min") {
+      if (maxPrice - inputValue >= LinkGap) {
+        setMinRange(inputValue);
+        setMinPrice(inputValue);
+      }
+    } else {
+      if (inputValue - minPrice >= LinkGap) {
+        setMaxRange(inputValue);
+        setMaxPrice(inputValue);
+      }
     }
-  }
-};
+  };
 
-const rangeStyle = {
-  left: `${((minPrice / parseFloat(maxRange)) * 100)}%`,
-  right: `${100 - ((maxPrice / parseFloat(maxRange)) * 100)}%`
-};
-// here is the functionality of the double sided slider ended 
-
+  const rangeStyle = {
+    left: `${(minPrice / parseFloat(maxRange)) * 100}%`,
+    right: `${100 - (maxPrice / parseFloat(maxRange)) * 100}%`,
+  };
+  // here is the functionality of the double sided slider ended
 
   useEffect(() => {
     if (bool) {
@@ -138,7 +138,7 @@ const rangeStyle = {
       const height = 400;
       let uniqueNodes = new Set();
       console.log(jsondata, "here is the json data ");
-    
+
       jsondata.forEach((item) => {
         if (!uniqueClassesTemp.includes(item.entity_1_class)) {
           uniqueClassesTemp.push(item.entity_1_class);
@@ -312,47 +312,84 @@ const rangeStyle = {
     // return () => simulation.stop();
   }, [jsondata]); // <-- Add doneItems2 as a dependency
 
-
   useEffect(() => {
+    // make the node and line intially null 
+    d3.selectAll(".node").style("display", null);
+    d3.selectAll("line").style("display", null);
 
-  let filteredLinks = d3.selectAll("line").filter(link => {
-      // Filter links with a value greater than 5
-      return link.value < minRange || link.value > maxRange
+    ////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////double slider functionality /////////////////////////////////////////
+   /////////////////////////////////////////////////////////////////////////////////////////
+
+    // Filter links with the slider max and min 
+    let filteredLinks = d3.selectAll("line").filter((link) => {
+      return link.value < minRange || link.value > maxRange;
     });
 
-    d3.selectAll(".node").style("display", (d) =>
-      doneItems2.includes(d.class) ? "none" : "block"
-    );
-  
-    d3.selectAll("line").style("display", (d) => {
-      console.log(d)
-      if (doneItems2.includes(d.source.class) || doneItems2.includes(d.type) 
-        || doneItems2.includes(d.target.class) 
-       ) {
-        return "none";
-      } else {
-        return "block";
-      }
+    // Filter nodes with the slider max and min 
+    let filterNodes = d3.selectAll(".node").filter((node) => {
+      return filteredLinks
+        .data()
+        .some((link) => link.target === node || link.source === node);
     });
 
-     // Hide the filtered links
-     filteredLinks.style("display", "none");
+
+    let filterNodes2 = filterNodes.filter((node) => {
+      // Check if there's at least one link connected to the node that is not in filteredLinks
+      const isLinkedToHiddenLink = d3
+        .selectAll("line")
+        .data()
+        .some((link) => {
+          return (
+            (link.target === node || link.source === node) &&
+            !filteredLinks.data().includes(link)
+          );
+        });
+
+      return isLinkedToHiddenLink;
+    });
+    // Hide the filtered links
+    filteredLinks.style("display", "none");
+    filterNodes.style("display", "none");
+    // Reset the display style for the filtered nodes
+    filterNodes2.style("display", null);
+
+  ////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////double slider functionality ended /////////////////////////////////////////
+   /////////////////////////////////////////////////////////////////////////////////////////
 
 
-     let visibleNodes = d3.selectAll(".node")
-
-  .filter(function() {
-    return d3.select(this).style("display") !== "none";
-  });
-  console.log(visibleNodes , "here are visible nodes " )
 
 
-  }, [doneItems2 , minRange , maxRange ]); 
 
+    // d3.selectAll(".node").style("display", (d) =>
+    //   doneItems2.includes(d.class) ? "none" : "block"
+    // );
 
+    // d3.selectAll("line").style("display", (d) => {
+    //   if (doneItems2.includes(d.source.class) || doneItems2.includes(d.type)
+    //     || doneItems2.includes(d.target.class)
+    //    ) {
+    //     return "none";
+    //   } else {
+    //     return "block";
+    //   }
+    // });
+
+    // this code is used to check the visibbilty of the node that are shown
+
+    let visibleNodes = d3
+      .selectAll(".node")
+
+      .filter(function () {
+        return d3.select(this).style("display") !== "none";
+      });
+    console.log(visibleNodes, "here are visible nodes ");
+  }, [doneItems2, minRange, maxRange]);
+
+  // this eneded  is used to check the visibbilty of the node that are shown
 
   const handleClick = (item) => {
-
     if (doneItems2.includes(item)) {
       setDoneItems2(doneItems2.filter((doneItem) => doneItem !== item));
     } else {
@@ -360,12 +397,11 @@ const rangeStyle = {
     }
   };
 
+  // code for the color pickerr
 
-  // code for the color pickerr 
-  
   const [showPicker, setShowPicker] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
-  
+
   const handleSpanClick = (event) => {
     const rect = event.target.getBoundingClientRect();
     setPickerPosition({
@@ -385,37 +421,64 @@ const rangeStyle = {
           <h1 className=" text-3xl text-center md:text-left">
             Force Network Graph
           </h1>
- 
 
           <svg ref={svgRef} className="  w-full h-auto"></svg>
         </div>
         <div className=" container m-1 w-full md:w-2/12">
-{/* here is the double slider  */}
+          {/* here is the double slider  */}
 
+          <div className="your-component mt-1 mb-3">
+            <div className="price-input">
+              <div className="field">
+                <span>Min</span>
+                <input
+                  type="number"
+                  className="input-min"
+                  value={minPrice}
+                  step={Linkstep}
+                  onChange={handlePriceInputChange}
+                />
+              </div>
+              <div className="separator">-</div>
+              <div className="field">
+                <span>Max</span>
+                <input
+                  type="number"
+                  className="input-max"
+                  value={maxPrice}
+                  step={Linkstep}
+                  onChange={handlePriceInputChange}
+                />
+              </div>
+            </div>
+            <div className="slider">
+              <div className="progress" style={rangeStyle}></div>
+            </div>
+            <div className="range-input">
+              <input
+                id="min_slider"
+                type="range"
+                className="range-min"
+                min={minStrength}
+                max={maxStrength}
+                step="0.1"
+                value={minRange}
+                onChange={handleRangeInputChange}
+              />
+              <input
+                id="max_slider"
+                type="range"
+                className="range-max"
+                min="4.0"
+                max="9.0"
+                step={Linkstep}
+                value={maxRange}
+                onChange={handleRangeInputChange}
+              />
+            </div>
+          </div>
 
-<div className="your-component mt-1 mb-3"  >
-      <div className="price-input">
-        <div className="field">
-          <span>Min</span>
-          <input type="number" className="input-min" value={minPrice} step={ Linkstep }  onChange={handlePriceInputChange} />
-        </div>
-        <div className="separator">-</div>
-        <div className="field">
-          <span>Max</span>
-          <input type="number" className="input-max" value={maxPrice} step={ Linkstep } onChange={handlePriceInputChange} />
-        </div>
-      </div>
-      <div className="slider">
-        <div className="progress" style={rangeStyle}></div>
-      </div>
-      <div className="range-input">
-        <input id="min_slider" type="range" className="range-min" min={minStrength} max={maxStrength} step="0.1" value={minRange} onChange={handleRangeInputChange} />
-        <input id="max_slider" type="range" className="range-max" min="4.0" max="9.0"
-        step={Linkstep} value={maxRange} onChange={handleRangeInputChange} />
-      </div>
-    </div>
-
-{/* ended double sider  */}
+          {/* ended double sider  */}
 
           <div className="legend">
             <h1 className="text-xl ml-2 font-bold">Legend data</h1>
@@ -458,7 +521,7 @@ const rangeStyle = {
                       ? "line-through"
                       : "none",
                   }}>
-                  <span 
+                  <span
                     className="circle"
                     style={{
                       backgroundColor: colorScales.entity_2(entity_2_li),
@@ -467,50 +530,48 @@ const rangeStyle = {
                       height: "10px",
                       borderRadius: "50%",
                       marginRight: "5px",
-                    }} 
+                    }}
                     onClick={handleSpanClick}></span>
 
                   <span onClick={() => handleClick(entity_2_li)}>
-                  {entity_2_li ? entity_2_li : "unknown"}
+                    {entity_2_li ? entity_2_li : "unknown"}
                   </span>
 
+                  {/* here is the code of the color picker box  */}
+                  {showPicker && (
+                    <div
+                      className="card"
+                      id="cardid"
+                      style={{
+                        display: "block",
+                        zIndex: 9999,
+                        position: "absolute",
+                        top: `${pickerPosition.top}px`,
+                        left: `${pickerPosition.left}px`,
+                      }}>
+                      <p className="cl-picker">change color</p>
+                      <ul className="ul_of_color_picker" id="colorList">
+                        {colors.map((color, index) => (
+                          <li
+                            key={index}
+                            style={{ listStyle: "none", margin: "5px 0" }}>
+                            <button
+                              style={{
+                                backgroundColor: color,
+                                width: "20px",
+                                height: "20px",
+                                border: "none",
+                                borderRadius: "50%",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => console.log(color)}></button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                    {/* here is the code of the color picker box  */}
-{showPicker && (
-        <div
-          className="card"
-          id="cardid"
-          style={{
-            display: 'block',
-            zIndex: 9999,
-            position: 'absolute',
-            top: `${pickerPosition.top}px`,
-            left: `${pickerPosition.left}px`,
-          }}
-        >
-          <p className="cl-picker">change color</p>
-          <ul className="ul_of_color_picker" id="colorList">
-            {colors.map((color, index) => (
-              <li key={index} style={{ listStyle: 'none', margin: '5px 0' }}>
-                <button
-                  style={{
-                    backgroundColor: color,
-                    width: '20px',
-                    height: '20px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => console.log(color)}
-                ></button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-                    {/* here ended the code of the color picker box  */}
-
+                  {/* here ended the code of the color picker box  */}
                 </li>
               ))}
             </ul>
