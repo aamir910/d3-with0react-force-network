@@ -59,6 +59,7 @@ const ForceDirectedGraph = () => {
 
   let node;
   let nodes = [];
+
   let uniqueClassesTemp = [];
   let uniqueClasses2Temp = [];
   let uniqLinkTemp = [];
@@ -140,21 +141,12 @@ const ForceDirectedGraph = () => {
       console.log(jsondata, "here is the json data ");
 
       jsondata.forEach((item) => {
-        if (!uniqueClassesTemp.includes(item.entity_1_class)) {
-          uniqueClassesTemp.push(item.entity_1_class);
-        }
-        if (!uniqueClasses2Temp.includes(item.entity_2_class)) {
-          uniqueClasses2Temp.push(item.entity_2_class);
-        }
-        if (!uniqLinkTemp.includes(item.Link_Type)) {
-          uniqLinkTemp.push(item.Link_Type);
-        }
-
+    console.log(item)
         if (!uniqueNodes.has(item.entity_1)) {
           uniqueNodes.add(item.entity_1);
           nodes.push({
             name: item.entity_1,
-            class: item.entity_1_class,
+            class1: item.entity_1_class,
             type: "entity_1",
           });
         }
@@ -162,15 +154,12 @@ const ForceDirectedGraph = () => {
           uniqueNodes.add(item.entity_2);
           nodes.push({
             name: item.entity_2,
-            class: item.entity_2_class,
+            class2: item.entity_2_class,
             type: "entity_2",
           });
         }
       });
 
-      setUniqueClasses(uniqueClassesTemp);
-      setUniqueClasses2(uniqueClasses2Temp);
-      setUniqueLinks(uniqLinkTemp);
 
       const links = jsondata.map((item) => ({
         source: item.entity_1,
@@ -253,13 +242,13 @@ const ForceDirectedGraph = () => {
         .append("rect")
         .attr("width", 30)
         .attr("height", 20)
-        .attr("fill", (d) => colorScale_entity_1(d.class));
+        .attr("fill", (d) => colorScale_entity_1(d.class1));
 
       node
         .filter((d) => d.type === "entity_2")
         .append("circle")
         .attr("r", 10)
-        .attr("fill", (d) => colorScale_entity_2(d.class));
+        .attr("fill", (d) => colorScale_entity_2(d.class2));
 
       node
         .append("text")
@@ -355,12 +344,44 @@ const ForceDirectedGraph = () => {
     filterNodes2.style("display", null);
 
   ////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////double slider functionality ended /////////////////////////////////////////
+  ////////////////////////////////double slider functionality ended /////////////////////////
    /////////////////////////////////////////////////////////////////////////////////////////
 
+  ////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////start  to show and hide the legend items ////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////
+  let visibleNodes = d3
+  .selectAll(".node")
+
+  .filter(function () {
+    return d3.select(this).style("display") !== "none";
+  });
+console.log(visibleNodes, "here are visible nodes ");
 
 
 
+visibleNodes.each( (item)=>{
+  // console.log(item , 'here is the item')
+  if(!uniqueClassesTemp.includes(item.class1)) {
+    uniqueClassesTemp.push(item.class1);
+  }
+  if (!uniqueClasses2Temp.includes(item.class2)) {
+    uniqueClasses2Temp.push(item.class2);
+  }
+  if (!uniqLinkTemp.includes(item.Link_Type)) {
+    uniqLinkTemp.push(item.Link_Type);
+  }
+  
+     
+  setUniqueClasses(uniqueClassesTemp);
+  setUniqueClasses2(uniqueClasses2Temp);
+  setUniqueLinks(uniqLinkTemp);
+})
+
+   
+  ////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////ended  to show and hide the legend items /////////////////////////////////////////
+   /////////////////////////////////////////////////////////////////////////////////////////
 
     // d3.selectAll(".node").style("display", (d) =>
     //   doneItems2.includes(d.class) ? "none" : "block"
@@ -378,13 +399,7 @@ const ForceDirectedGraph = () => {
 
     // this code is used to check the visibbilty of the node that are shown
 
-    let visibleNodes = d3
-      .selectAll(".node")
-
-      .filter(function () {
-        return d3.select(this).style("display") !== "none";
-      });
-    console.log(visibleNodes, "here are visible nodes ");
+   
   }, [doneItems2, minRange, maxRange]);
 
   // this eneded  is used to check the visibbilty of the node that are shown
