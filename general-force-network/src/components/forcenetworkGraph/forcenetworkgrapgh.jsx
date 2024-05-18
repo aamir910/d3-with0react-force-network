@@ -45,6 +45,8 @@ const ForceDirectedGraph = () => {
     "silver",
     "violet",
   ];
+
+
   const color_link = [
     "grey",
     "pink",
@@ -55,6 +57,8 @@ const ForceDirectedGraph = () => {
     "brown",
     "navy",
   ];
+
+
   let node;
   let nodes = [];
   let uniqueClassesTemp = [];
@@ -348,6 +352,23 @@ const rangeStyle = {
   };
 
 
+  // code for the color pickerr 
+  
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+
+  const handleSpanClick = (event) => {
+    const rect = event.target.getBoundingClientRect();
+    setPickerPosition({
+      top: rect.bottom,
+      left: rect.left,
+    });
+    setShowPicker(!showPicker);
+  };
+  // ended the code of color picker  .
+
+
+
   
  
 
@@ -432,7 +453,7 @@ const rangeStyle = {
                       ? "line-through"
                       : "none",
                   }}>
-                  <span
+                  <span 
                     className="circle"
                     style={{
                       backgroundColor: colorScales.entity_2(entity_2_li),
@@ -441,7 +462,46 @@ const rangeStyle = {
                       height: "10px",
                       borderRadius: "50%",
                       marginRight: "5px",
-                    }}></span>
+                    }} 
+                    
+        onClick={handleSpanClick}></span>
+
+                    {/* here is the code of the color picker box  */}
+{showPicker && (
+        <div
+          className="card"
+          id="cardid"
+          style={{
+            display: 'block',
+            zIndex: 9999,
+            position: 'absolute',
+            top: `${pickerPosition.top}px`,
+            left: `${pickerPosition.left}px`,
+          }}
+        >
+          <p className="cl-picker">change color</p>
+          <ul className="ul_of_color_picker" id="colorList">
+            {colors.map((color, index) => (
+              <li key={index} style={{ listStyle: 'none', margin: '5px 0' }}>
+                <button
+                  style={{
+                    backgroundColor: color,
+                    width: '20px',
+                    height: '20px',
+                    border: 'none',
+                    borderRadius: '50%',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => console.log(color)}
+                ></button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+                    {/* here ended the code of the color picker box  */}
+
                   <span onClick={() => handleClick(entity_2_li)}>
                     {entity_2_li}
                   </span>
