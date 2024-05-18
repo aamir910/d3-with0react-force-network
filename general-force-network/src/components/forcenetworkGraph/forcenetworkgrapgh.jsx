@@ -141,13 +141,13 @@ const ForceDirectedGraph = () => {
       console.log(jsondata, "here is the json data ");
 
       jsondata.forEach((item) => {
-    console.log(item)
         if (!uniqueNodes.has(item.entity_1)) {
           uniqueNodes.add(item.entity_1);
           nodes.push({
             name: item.entity_1,
             class1: item.entity_1_class,
             type: "entity_1",
+            link_type : item.Link_Type
           });
         }
         if (!uniqueNodes.has(item.entity_2)) {
@@ -156,6 +156,8 @@ const ForceDirectedGraph = () => {
             name: item.entity_2,
             class2: item.entity_2_class,
             type: "entity_2",
+
+            link_type : item.Link_Type
           });
         }
       });
@@ -297,7 +299,6 @@ const ForceDirectedGraph = () => {
       bool = false;
     }
 
-    console.log(doneItems2, "check2");
     // return () => simulation.stop();
   }, [jsondata]); // <-- Add doneItems2 as a dependency
 
@@ -305,6 +306,29 @@ const ForceDirectedGraph = () => {
     // make the node and line intially null 
     d3.selectAll(".node").style("display", null);
     d3.selectAll("line").style("display", null);
+
+
+
+
+
+
+
+    d3.selectAll(".node").style("display", (d) =>
+      (doneItems2.includes(d.class1) ||doneItems2.includes(d.class2) ) ? "none" : "block"
+     );
+ 
+     d3.selectAll("line").style("display", (d) => {
+       if (doneItems2.includes(d.source.class1) ||doneItems2.includes(d.source.class2) || doneItems2.includes(d.type)
+         || doneItems2.includes(d.target.class1)  || doneItems2.includes(d.target.class2)
+        ) {
+         return "none";
+       }
+        else {
+         return "block";
+       }
+     });
+ 
+
 
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////double slider functionality /////////////////////////////////////////
@@ -356,47 +380,35 @@ const ForceDirectedGraph = () => {
   .filter(function () {
     return d3.select(this).style("display") !== "none";
   });
-console.log(visibleNodes, "here are visible nodes ");
 
 
 
 visibleNodes.each( (item)=>{
-  // console.log(item , 'here is the item')
-  if(!uniqueClassesTemp.includes(item.class1)) {
+  console.log(item.class1,   'here it is ' ,item.class2  , doneItems2)
+  if(!uniqueClassesTemp.includes(item.class1) && !doneItems2.includes(item.class1)) {
     uniqueClassesTemp.push(item.class1);
   }
-  if (!uniqueClasses2Temp.includes(item.class2)) {
+  if (!uniqueClasses2Temp.includes(item.class2)  && !doneItems2.includes(item.class2)) {
     uniqueClasses2Temp.push(item.class2);
   }
-  if (!uniqLinkTemp.includes(item.Link_Type)) {
-    uniqLinkTemp.push(item.Link_Type);
+  if (!uniqLinkTemp.includes(item.link_type)  && !doneItems2.includes(item.link_type) ) {
+    uniqLinkTemp.push(item.link_type);
   }
   
-     
   setUniqueClasses(uniqueClassesTemp);
   setUniqueClasses2(uniqueClasses2Temp);
   setUniqueLinks(uniqLinkTemp);
 })
+
 
    
   ////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////ended  to show and hide the legend items /////////////////////////////////////////
    /////////////////////////////////////////////////////////////////////////////////////////
 
-    // d3.selectAll(".node").style("display", (d) =>
-    //   doneItems2.includes(d.class) ? "none" : "block"
-    // );
 
-    // d3.selectAll("line").style("display", (d) => {
-    //   if (doneItems2.includes(d.source.class) || doneItems2.includes(d.type)
-    //     || doneItems2.includes(d.target.class)
-    //    ) {
-    //     return "none";
-    //   } else {
-    //     return "block";
-    //   }
-    // });
 
+ 
     // this code is used to check the visibbilty of the node that are shown
 
    
@@ -520,7 +532,7 @@ visibleNodes.each( (item)=>{
                       marginRight: "5px",
                     }}></span>
                   <span onClick={() => handleClick(entity_1_li)}>
-                    {entity_1_li}
+                  {entity_1_li ? entity_1_li : "unknown"}
                   </span>
                 </li>
               ))}
