@@ -338,6 +338,15 @@ const rangeStyle = {
      // Hide the filtered links
      filteredLinks.style("display", "none");
 
+
+     let visibleNodes = d3.selectAll(".node")
+
+  .filter(function() {
+    return d3.select(this).style("display") !== "none";
+  });
+  console.log(visibleNodes , "here are visible nodes " )
+
+
   }, [doneItems2 , minRange , maxRange ]); 
 
 
@@ -356,7 +365,7 @@ const rangeStyle = {
   
   const [showPicker, setShowPicker] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
-
+  
   const handleSpanClick = (event) => {
     const rect = event.target.getBoundingClientRect();
     setPickerPosition({
@@ -365,12 +374,8 @@ const rangeStyle = {
     });
     setShowPicker(!showPicker);
   };
+
   // ended the code of color picker  .
-
-
-
-  
- 
 
   return (
     <>
@@ -463,8 +468,12 @@ const rangeStyle = {
                       borderRadius: "50%",
                       marginRight: "5px",
                     }} 
-                    
-        onClick={handleSpanClick}></span>
+                    onClick={handleSpanClick}></span>
+
+                  <span onClick={() => handleClick(entity_2_li)}>
+                  {entity_2_li ? entity_2_li : "unknown"}
+                  </span>
+
 
                     {/* here is the code of the color picker box  */}
 {showPicker && (
@@ -502,9 +511,6 @@ const rangeStyle = {
 
                     {/* here ended the code of the color picker box  */}
 
-                  <span onClick={() => handleClick(entity_2_li)}>
-                    {entity_2_li}
-                  </span>
                 </li>
               ))}
             </ul>
