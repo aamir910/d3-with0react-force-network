@@ -177,7 +177,7 @@ const ForceDirectedGraph = () => {
         .style("display", "block")
         .style("margin", "auto");
 
-      svg.selectAll("*").remove();
+        svg.selectAll("*").remove();
       const colorScale_entity_1 = d3
         .scaleOrdinal()
         .domain([...uniqueClassesTemp])
@@ -369,30 +369,34 @@ const ForceDirectedGraph = () => {
   ////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////start  to show and hide the legend items ////////////////
   /////////////////////////////////////////////////////////////////////////////////////////
+  
   let visibleNodes = d3
   .selectAll(".node")
-
   .filter(function () {
     return d3.select(this).style("display") !== "none";
   });
-
-
-
+  
 visibleNodes.each( (item)=>{
   if(!uniqueClassesTemp.includes(item.class1) ) {
     uniqueClassesTemp.push(item.class1);
+
   }
   if (!uniqueClasses2Temp.includes(item.class2) ) {
-    console.log(doneItems2  , 'here is item done there ')
+    
     uniqueClasses2Temp.push(item.class2);
+    
+    uniqueClasses2Temp.push(...doneItems2);
+
   }
   if (!uniqLinkTemp.includes(item.link_type)) {
     uniqLinkTemp.push(item.link_type);
   }
   
+
   setUniqueClasses(uniqueClassesTemp);
   setUniqueClasses2(uniqueClasses2Temp);
   setUniqueLinks(uniqLinkTemp);
+
 })
 
 
