@@ -307,12 +307,7 @@ const ForceDirectedGraph = () => {
     d3.selectAll(".node").style("display", null);
     d3.selectAll("line").style("display", null);
 
-
-
-
-
-
-
+    
     d3.selectAll(".node").style("display", (d) =>
       (doneItems2.includes(d.class1) ||doneItems2.includes(d.class2) ) ? "none" : "block"
      );
@@ -332,8 +327,8 @@ const ForceDirectedGraph = () => {
 
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////double slider functionality /////////////////////////////////////////
-   /////////////////////////////////////////////////////////////////////////////////////////
-
+    /////////////////////////////////////////////////////////////////////////////////////////
+             
     // Filter links with the slider max and min 
     let filteredLinks = d3.selectAll("line").filter((link) => {
       return link.value < minRange || link.value > maxRange;
@@ -384,14 +379,14 @@ const ForceDirectedGraph = () => {
 
 
 visibleNodes.each( (item)=>{
-  console.log(item.class1,   'here it is ' ,item.class2  , doneItems2)
-  if(!uniqueClassesTemp.includes(item.class1) && !doneItems2.includes(item.class1)) {
+  if(!uniqueClassesTemp.includes(item.class1) ) {
     uniqueClassesTemp.push(item.class1);
   }
-  if (!uniqueClasses2Temp.includes(item.class2)  && !doneItems2.includes(item.class2)) {
+  if (!uniqueClasses2Temp.includes(item.class2) ) {
+    console.log(doneItems2  , 'here is item done there ')
     uniqueClasses2Temp.push(item.class2);
   }
-  if (!uniqLinkTemp.includes(item.link_type)  && !doneItems2.includes(item.link_type) ) {
+  if (!uniqLinkTemp.includes(item.link_type)) {
     uniqLinkTemp.push(item.link_type);
   }
   
